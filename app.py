@@ -103,24 +103,28 @@ PAGE_CONTENT = {
 SERVICES = {
     'portrait': {
         'name': 'Portrait Professionnel',
+        'price': '',
         'duration': '1-2 heures',
         'description': 'Séance portrait en studio ou extérieur avec retouches incluses',
         'includes': ['Séance photo', '10 photos retouchées', 'Galerie privée en ligne']
     },
     'mariage': {
         'name': 'Photographie de Mariage',
+        'price': '',
         'duration': 'Journée complète',
         'description': 'Couverture complète de votre mariage avec reportage photo',
         'includes': ['Préparatifs', 'Cérémonie', 'Cocktail', 'Soirée', '200+ photos retouchées']
     },
     'evenement': {
         'name': 'Événement Corporate',
+        'price': '',
         'duration': '2-4 heures',
         'description': 'Couverture photographique de vos événements professionnels',
         'includes': ['Reportage complet', 'Photos haute résolution', 'Livraison 48h']
     },
     'famille': {
         'name': 'Séance Famille',
+        'price': '',
         'duration': '1 heure',
         'description': 'Séance photo famille en extérieur ou à domicile',
         'includes': ['Séance photo', '15 photos retouchées', 'Impression offerte']
@@ -158,16 +162,18 @@ def book_service(service_type):
         if budget:
             whatsapp_message += f"💰 Budget: {budget}\n"
         whatsapp_message += f"\n💬 Message:\n{message}\n\n"
-        whatsapp_message += f"Service: {service_name} ({service['price']})"
+        whatsapp_message += f"Service: {service_name} ({service.get('price', 'Prix sur demande')})"
         
         # Numéro WhatsApp du photographe (à modifier avec votre vrai numéro)
         photographer_phone = PAGE_CONTENT['contact']['whatsapp']
         
         # URL WhatsApp
         import urllib.parse
-        whatsapp_url = f"https://wa.me/{photographer_phone.replace('+', '')}?text={urllib.parse.quote(whatsapp_message)}"
+        # Nettoyer le numéro (enlever espaces, tirets, etc.)
+        clean_phone = photographer_phone.replace('+', '').replace(' ', '').replace('-', '')
+        whatsapp_url = f"https://wa.me/{clean_phone}?text={urllib.parse.quote(whatsapp_message)}"
         
-        # Rediriger vers WhatsApp
+        # Rediriger directement vers WhatsApp
         return redirect(whatsapp_url)
     
     return render_template('book_service.html', service=service, service_type=service_type)
