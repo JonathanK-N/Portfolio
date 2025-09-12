@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une image - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}" class="active"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Ajouter une image</h1>
+                <a href="{{ url_for('admin_gallery') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la galerie
+                </a>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <form method="POST" enctype="multipart/form-data" class="admin-form">
+                    <div class="form-group">
+                        <label for="title">Titre de l'image *</label>
+                        <input type="text" id="title" name="title" required placeholder="Ex: Portrait Corporate Élégant">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Catégorie *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            <option value="portrait">Portrait</option>
+                            <option value="mariage">Mariage</option>
+                            <option value="nature">Nature</option>
+                            <option value="architecture">Architecture</option>
+                            <option value="mode">Mode</option>
+                            <option value="evenement">Événement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file">Fichier image *</label>
+                        <div class="file-upload">
+                            <input type="file" id="file" name="file" accept="image/*" required>
+                            <div class="file-upload-text">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Cliquez pour sélectionner une image</p>
+                                <small>Formats acceptés: JPG, PNG, GIF (max 16MB)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImg" src="" alt="Aperçu">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Ajouter l'image
+                        </button>
+                        <a href="{{ url_for('admin_gallery') }}" class="btn-cancel">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Aperçu de l'image
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier À Propos - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('admin_pages') }}" class="active"><i class="fas fa-file-alt"></i> Pages</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Modifier la page À Propos</h1>
+                <a href="{{ url_for('admin_pages') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour aux pages
+                </a>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <form method="POST" enctype="multipart/form-data" class="admin-form">
+                    <div class="form-group">
+                        <label for="title">Titre principal *</label>
+                        <input type="text" id="title" name="title" value="{{ content.title }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subtitle">Sous-titre *</label>
+                        <textarea id="subtitle" name="subtitle" rows="2" required>{{ content.subtitle }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" rows="4" required>{{ content.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="philosophy">Philosophie *</label>
+                        <textarea id="philosophy" name="philosophy" rows="3" required>{{ content.philosophy }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">Photo du photographe</label>
+                        <div class="current-photo">
+                            <img src="{{ url_for('static', filename='images/' + content.photo) }}" alt="Photo actuelle" style="max-width: 200px; border-radius: 10px;">
+                            <p>Photo actuelle: {{ content.photo }}</p>
+                        </div>
+                        <div class="file-upload">
+                            <input type="file" id="photo" name="photo" accept="image/*">
+                            <div class="file-upload-text">
+                                <i class="fas fa-camera"></i>
+                                <p>Changer la photo (optionnel)</p>
+                                <small>Formats acceptés: JPG, PNG, GIF</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-section">
+                        <h3>Statistiques</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="projects">Projets réalisés</label>
+                                <input type="text" id="projects" name="projects" value="{{ content.stats.projects }}" placeholder="500+">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="experience">Années d'expérience</label>
+                                <input type="text" id="experience" name="experience" value="{{ content.stats.experience }}" placeholder="10+">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="satisfaction">Satisfaction client</label>
+                                <input type="text" id="satisfaction" name="satisfaction" value="{{ content.stats.satisfaction }}" placeholder="100%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <a href="{{ url_for('admin_pages') }}" class="btn-cancel">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Aperçu de la nouvelle photo
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const currentPhoto = document.querySelector('.current-photo img');
+                    currentPhoto.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

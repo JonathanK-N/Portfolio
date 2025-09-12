@@ -45,20 +45,20 @@
             </div>
             
             <div class="about-image">
-                <img src="{{ url_for('static', filename='images/about-photo.jpg') }}" 
+                <img src="{{ url_for('static', filename='images/' + content.photo) }}" 
                      alt="PRiMA - Photographe" 
                      onerror="this.style.display='none'">
                 <div class="about-stats">
                     <div class="stat">
-                        <h3>500+</h3>
+                        <h3>{{ content.stats.projects }}</h3>
                         <p>Projets Réalisés</p>
                     </div>
                     <div class="stat">
-                        <h3>10+</h3>
+                        <h3>{{ content.stats.experience }}</h3>
                         <p>Années d'Expérience</p>
                     </div>
                     <div class="stat">
-                        <h3>100%</h3>
+                        <h3>{{ content.stats.satisfaction }}</h3>
                         <p>Clients Satisfaits</p>
                     </div>
                 </div>

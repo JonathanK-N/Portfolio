@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Contact - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('admin_pages') }}" class="active"><i class="fas fa-file-alt"></i> Pages</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Modifier la page Contact</h1>
+                <a href="{{ url_for('admin_pages') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour aux pages
+                </a>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <form method="POST" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" value="{{ content.email }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Téléphone *</label>
+                            <input type="text" id="phone" name="phone" value="{{ content.phone }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Localisation *</label>
+                            <input type="text" id="location" name="location" value="{{ content.location }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="whatsapp">WhatsApp *</label>
+                            <input type="text" id="whatsapp" name="whatsapp" value="{{ content.whatsapp }}" required placeholder="+33123456789">
+                            <small>Format international avec indicatif pays (ex: +33123456789)</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hours">Horaires de disponibilité</label>
+                        <textarea id="hours" name="hours" rows="3" placeholder="Lun - Ven: 9h - 18h">{{ content.hours|safe }}</textarea>
+                        <small>Vous pouvez utiliser des balises HTML comme &lt;br&gt; pour les retours à la ligne</small>
+                    </div>
+
+                    <div class="contact-preview">
+                        <h3>Aperçu</h3>
+                        <div class="preview-card">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h4>Email</h4>
+                                    <p id="preview-email">{{ content.email }}</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h4>Téléphone</h4>
+                                    <p id="preview-phone">{{ content.phone }}</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h4>Localisation</h4>
+                                    <p id="preview-location">{{ content.location }}</p>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-whatsapp"></i>
+                                <div>
+                                    <h4>WhatsApp</h4>
+                                    <p id="preview-whatsapp">{{ content.whatsapp }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <a href="{{ url_for('admin_pages') }}" class="btn-cancel">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Aperçu en temps réel
+        document.getElementById('email').addEventListener('input', function() {
+            document.getElementById('preview-email').textContent = this.value;
+        });
+        
+        document.getElementById('phone').addEventListener('input', function() {
+            document.getElementById('preview-phone').textContent = this.value;
+        });
+        
+        document.getElementById('location').addEventListener('input', function() {
+            document.getElementById('preview-location').textContent = this.value;
+        });
+        
+        document.getElementById('whatsapp').addEventListener('input', function() {
+            document.getElementById('preview-whatsapp').textContent = this.value;
+        });
+    </script>
+</body>
+</html>

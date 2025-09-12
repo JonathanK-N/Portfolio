@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Service - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}" class="active"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Modifier le service</h1>
+                <a href="{{ url_for('admin_services') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour aux services
+                </a>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <form method="POST" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Nom du service *</label>
+                            <input type="text" id="name" name="name" value="{{ service.name }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="price">Prix *</label>
+                            <input type="text" id="price" name="price" value="{{ service.price }}" required placeholder="À partir de 150€">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duration">Durée *</label>
+                        <input type="text" id="duration" name="duration" value="{{ service.duration }}" required placeholder="1-2 heures">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" rows="3" required>{{ service.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prestations incluses</label>
+                        <div id="includes-container">
+                            {% for item in service.includes %}
+                            <div class="include-item">
+                                <input type="text" name="include_{{ loop.index0 }}" value="{{ item }}" placeholder="Prestation incluse">
+                                <button type="button" class="btn-remove" onclick="removeInclude(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                            
+                            {% for i in range(service.includes|length, 10) %}
+                            <div class="include-item">
+                                <input type="text" name="include_{{ i }}" placeholder="Prestation incluse">
+                                <button type="button" class="btn-remove" onclick="removeInclude(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" class="btn-add" onclick="addInclude()">
+                            <i class="fas fa-plus"></i> Ajouter une prestation
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <a href="{{ url_for('admin_services') }}" class="btn-cancel">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function removeInclude(button) {
+            const item = button.parentElement;
+            const input = item.querySelector('input');
+            input.value = '';
+            item.style.display = 'none';
+        }
+
+        function addInclude() {
+            const container = document.getElementById('includes-container');
+            const hiddenItems = container.querySelectorAll('.include-item[style*="none"]');
+            
+            if (hiddenItems.length > 0) {
+                const item = hiddenItems[0];
+                item.style.display = 'flex';
+                item.querySelector('input').focus();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('admin_pages') }}"><i class="fas fa-file-alt"></i> Pages</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Tableau de bord</h1>
+                <p>Gérez votre portfolio photographique</p>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-images"></i></div>
+                    <div class="stat-info">
+                        <h3>{{ images|length }}</h3>
+                        <p>Images dans la galerie</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-cogs"></i></div>
+                    <div class="stat-info">
+                        <h3>{{ services|length }}</h3>
+                        <p>Services disponibles</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                    <div class="stat-info">
+                        <h3>En ligne</h3>
+                        <p>Statut du site</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <h2>Actions rapides</h2>
+                <div class="action-cards">
+                    <a href="{{ url_for('admin_add_image') }}" class="action-card">
+                        <i class="fas fa-plus"></i>
+                        <h3>Ajouter une image</h3>
+                        <p>Ajoutez une nouvelle photo à votre galerie</p>
+                    </a>
+                    
+                    <a href="{{ url_for('admin_gallery') }}" class="action-card">
+                        <i class="fas fa-edit"></i>
+                        <h3>Gérer la galerie</h3>
+                        <p>Organisez et modifiez vos photos</p>
+                    </a>
+                    
+                    <a href="{{ url_for('admin_services') }}" class="action-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Modifier les services</h3>
+                        <p>Mettez à jour vos prestations et tarifs</p>
+                    </a>
+                </div>
+            </div>
+
+            <div class="recent-images">
+                <h2>Images récentes</h2>
+                <div class="images-grid">
+                    {% for image in images[-6:] %}
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" alt="{{ image.title }}">
+                        <div class="image-info">
+                            <h4>{{ image.title }}</h4>
+                            <span class="category">{{ image.category|title }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

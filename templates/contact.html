@@ -22,28 +22,28 @@
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h3>Email</h3>
-                            <p>contact@primaphoto.com</p>
+                            <p>{{ content.email }}</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-phone"></i>
                         <div>
                             <h3>Téléphone</h3>
-                            <p>+1 819-674-5823</p>
+                            <p>{{ content.phone }}</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
                             <h3>Localisation</h3>
-                            <p>Sherbrooke, Québec, Canada</p>
+                            <p>{{ content.location }}</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-clock"></i>
                         <div>
                             <h3>Disponibilité</h3>
-                            <p> Sur rendez-vous</p>
+                            <p>{{ content.hours|safe }}</p>
                         </div>
                     </div>
                 </div>

@@ -1,12 +1,24 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 import os
+import json
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = 'prima_photo_secret_key'
+app.secret_key = os.environ.get('SECRET_KEY', 'prima_photo_secret_key_change_in_production')
 
 # Configuration pour les images
-UPLOAD_FOLDER = 'static/images/gallery'
+UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+
+# Configuration admin
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'prima2024')
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Données du portfolio professionnel
 GALLERY_IMAGES = [
@@ -62,7 +74,30 @@ def gallery():
 
 @app.route('/a-propos')
 def about():
-    return render_template('about.html')
+    return render_template('about.html', content=PAGE_CONTENT['about'])
+
+# Contenu des pages
+PAGE_CONTENT = {
+    'about': {
+        'title': 'Bonjour, je suis PRiMA',
+        'subtitle': 'Photographe professionnel passionné par l\'art de capturer les moments uniques et les émotions authentiques.',
+        'description': 'Avec plus de 10 ans d\'expérience dans le domaine de la photographie, j\'ai eu le privilège de travailler avec des clients variés, des particuliers aux entreprises, en passant par les événements les plus prestigieux.',
+        'philosophy': 'Ma philosophie est simple : chaque photo raconte une histoire. Mon rôle est de révéler la beauté naturelle de chaque instant, que ce soit lors d\'un portrait intime, d\'un mariage romantique, ou d\'un événement corporate.',
+        'photo': 'about-photo.jpg',
+        'stats': {
+            'projects': '500+',
+            'experience': '10+',
+            'satisfaction': '100%'
+        }
+    },
+    'contact': {
+        'email': 'contact@primaphoto.com',
+        'phone': '+33 1 23 45 67 89',
+        'location': 'Paris, France',
+        'hours': 'Lun - Ven: 9h - 18h<br>Sam: Sur rendez-vous',
+        'whatsapp': '+33123456789'
+    }
+}
 
 # Services disponibles
 SERVICES = {
@@ -126,7 +161,7 @@ def book_service(service_type):
         whatsapp_message += f"Service: {service_name} ({service['price']})"
         
         # Numéro WhatsApp du photographe (à modifier avec votre vrai numéro)
-        photographer_phone = "+18196745823"  # IMPORTANT: Remplacez par votre numéro WhatsApp
+        photographer_phone = PAGE_CONTENT['contact']['whatsapp']
         
         # URL WhatsApp
         import urllib.parse
@@ -148,13 +183,180 @@ def contact():
         flash('Merci pour votre message ! Je vous répondrai rapidement.', 'success')
         return redirect(url_for('contact'))
     
-    return render_template('contact.html')
+    return render_template('contact.html', content=PAGE_CONTENT['contact'])
+
+# Routes Admin
+@app.route('/admin')
+def admin_login():
+    if 'admin_logged_in' in session:
+        return redirect(url_for('admin_dashboard'))
+    return render_template('admin/login.html')
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login_post():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    
+    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        session['admin_logged_in'] = True
+        flash('Connexion réussie !', 'success')
+        return redirect(url_for('admin_dashboard'))
+    else:
+        flash('Identifiants incorrects', 'error')
+        return redirect(url_for('admin_login'))
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    flash('Déconnexion réussie', 'success')
+    return redirect(url_for('admin_login'))
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/dashboard.html', images=GALLERY_IMAGES, services=SERVICES, content=PAGE_CONTENT)
+
+@app.route('/admin/gallery')
+def admin_gallery():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/gallery.html', images=GALLERY_IMAGES)
+
+@app.route('/admin/gallery/add', methods=['GET', 'POST'])
+def admin_add_image():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        category = request.form.get('category')
+        file = request.files.get('file')
+        
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join('static/images/gallery', filename))
+            
+            new_image = {
+                'filename': filename,
+                'title': title,
+                'category': category
+            }
+            GALLERY_IMAGES.append(new_image)
+            
+            flash('Image ajoutée avec succès !', 'success')
+            return redirect(url_for('admin_gallery'))
+        else:
+            flash('Fichier invalide', 'error')
+    
+    return render_template('admin/add_image.html')
+
+@app.route('/admin/gallery/delete/<int:image_id>')
+def admin_delete_image(image_id):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if 0 <= image_id < len(GALLERY_IMAGES):
+        deleted_image = GALLERY_IMAGES.pop(image_id)
+        # Supprimer le fichier physique
+        try:
+            os.remove(os.path.join('static/images/gallery', deleted_image['filename']))
+        except:
+            pass
+        flash('Image supprimée !', 'success')
+    
+    return redirect(url_for('admin_gallery'))
+
+@app.route('/admin/services')
+def admin_services():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/services.html', services=SERVICES)
+
+@app.route('/admin/services/edit/<service_key>', methods=['GET', 'POST'])
+def admin_edit_service(service_key):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if service_key not in SERVICES:
+        flash('Service non trouvé', 'error')
+        return redirect(url_for('admin_services'))
+    
+    if request.method == 'POST':
+        SERVICES[service_key]['name'] = request.form.get('name')
+        SERVICES[service_key]['price'] = request.form.get('price')
+        SERVICES[service_key]['duration'] = request.form.get('duration')
+        SERVICES[service_key]['description'] = request.form.get('description')
+        
+        # Gestion des inclusions
+        includes = []
+        for i in range(10):  # Max 10 inclusions
+            include = request.form.get(f'include_{i}')
+            if include and include.strip():
+                includes.append(include.strip())
+        SERVICES[service_key]['includes'] = includes
+        
+        flash('Service mis à jour !', 'success')
+        return redirect(url_for('admin_services'))
+    
+    return render_template('admin/edit_service.html', service=SERVICES[service_key], service_key=service_key)
+
+@app.route('/admin/pages')
+def admin_pages():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/pages.html', content=PAGE_CONTENT)
+
+@app.route('/admin/pages/about', methods=['GET', 'POST'])
+def admin_edit_about():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        PAGE_CONTENT['about']['title'] = request.form.get('title')
+        PAGE_CONTENT['about']['subtitle'] = request.form.get('subtitle')
+        PAGE_CONTENT['about']['description'] = request.form.get('description')
+        PAGE_CONTENT['about']['philosophy'] = request.form.get('philosophy')
+        PAGE_CONTENT['about']['stats']['projects'] = request.form.get('projects')
+        PAGE_CONTENT['about']['stats']['experience'] = request.form.get('experience')
+        PAGE_CONTENT['about']['stats']['satisfaction'] = request.form.get('satisfaction')
+        
+        # Gestion de la photo
+        file = request.files.get('photo')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join('static/images', filename))
+            PAGE_CONTENT['about']['photo'] = filename
+        
+        flash('Page À propos mise à jour !', 'success')
+        return redirect(url_for('admin_pages'))
+    
+    return render_template('admin/edit_about.html', content=PAGE_CONTENT['about'])
+
+@app.route('/admin/pages/contact', methods=['GET', 'POST'])
+def admin_edit_contact():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        PAGE_CONTENT['contact']['email'] = request.form.get('email')
+        PAGE_CONTENT['contact']['phone'] = request.form.get('phone')
+        PAGE_CONTENT['contact']['location'] = request.form.get('location')
+        PAGE_CONTENT['contact']['hours'] = request.form.get('hours')
+        PAGE_CONTENT['contact']['whatsapp'] = request.form.get('whatsapp')
+        
+        flash('Page Contact mise à jour !', 'success')
+        return redirect(url_for('admin_pages'))
+    
+    return render_template('admin/edit_contact.html', content=PAGE_CONTENT['contact'])
+
+# Créer les dossiers nécessaires au démarrage
+os.makedirs('static/images/gallery', exist_ok=True)
+os.makedirs('static/css', exist_ok=True)
+os.makedirs('static/js', exist_ok=True)
+os.makedirs('templates', exist_ok=True)
+os.makedirs('templates/admin', exist_ok=True)
 
 if __name__ == '__main__':
-    # Créer les dossiers nécessaires
-    os.makedirs('static/images/gallery', exist_ok=True)
-    os.makedirs('static/css', exist_ok=True)
-    os.makedirs('static/js', exist_ok=True)
-    os.makedirs('templates', exist_ok=True)
-    
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
