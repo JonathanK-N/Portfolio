@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Réserver {{ service.name }} - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="booking-header">
+    <div class="container">
+        <div class="booking-breadcrumb">
+            <a href="{{ url_for('services') }}">Services</a> 
+            <span>/</span> 
+            <span>{{ service.name }}</span>
+        </div>
+        <h1>Réserver : {{ service.name }}</h1>
+        <p>{{ service.description }}</p>
+    </div>
+</section>
+
+<section class="booking-content">
+    <div class="container">
+        <div class="booking-grid">
+            <div class="service-summary">
+                <div class="summary-card">
+                    <h3>Récapitulatif</h3>
+                    <div class="service-details">
+                        <h4>{{ service.name }}</h4>
+                        <div class="detail-item">
+                            <i class="fas fa-euro-sign"></i>
+                            <span>{{ service.price }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ service.duration }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="includes-list">
+                        <h4>Prestations incluses :</h4>
+                        <ul>
+                            {% for item in service.includes %}
+                            <li><i class="fas fa-check"></i> {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="booking-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Un devis personnalisé vous sera envoyé après validation de votre demande.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-form-container">
+                <form class="booking-form" method="POST">
+                    <h3>Informations de réservation</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Nom complet *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Téléphone *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date souhaitée *</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                    </div>
+                    
+                    {% if service_type == 'mariage' %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="venue">Lieu de l'événement</label>
+                            <input type="text" id="venue" name="venue" placeholder="Adresse du lieu">
+                        </div>
+                        <div class="form-group">
+                            <label for="guests">Nombre d'invités</label>
+                            <select id="guests" name="guests">
+                                <option value="">Sélectionnez</option>
+                                <option value="0-50">0-50 personnes</option>
+                                <option value="50-100">50-100 personnes</option>
+                                <option value="100-150">100-150 personnes</option>
+                                <option value="150+">150+ personnes</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if service_type == 'portrait' %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location_type">Type de lieu</label>
+                            <select id="location_type" name="location_type">
+                                <option value="">Sélectionnez</option>
+                                <option value="studio">En studio</option>
+                                <option value="exterieur">En extérieur</option>
+                                <option value="domicile">À domicile</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nb_people">Nombre de personnes</label>
+                            <select id="nb_people" name="nb_people">
+                                <option value="1">1 personne</option>
+                                <option value="2">2 personnes</option>
+                                <option value="3-5">3-5 personnes</option>
+                                <option value="6+">6+ personnes</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="budget">Budget approximatif</label>
+                        <select id="budget" name="budget">
+                            <option value="">Sélectionnez votre budget</option>
+                            {% if service_type == 'portrait' %}
+                            <option value="150-300">150$ - 300$</option>
+                            <option value="300-500">300$ - 500$</option>
+                            <option value="500+">500$+</option>
+                            {% elif service_type == 'mariage' %}
+                            <option value="1200-2000">1200$ - 2000$</option>
+                            <option value="2000-3500">2000$ - 3500$</option>
+                            <option value="3500+">3500$+</option>
+                            {% else %}
+                            <option value="400-800">400$ - 800$</option>
+                            <option value="800-1500">800$ - 1500$</option>
+                            <option value="1500+">1500$+</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Décrivez votre projet *</label>
+                        <textarea id="message" name="message" rows="5" required 
+                                  placeholder="Parlez-moi de votre projet, vos attentes, le style souhaité, les détails importants..."></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="newsletter" value="1">
+                            <span class="checkmark"></span>
+                            Je souhaite recevoir des informations sur les nouveautés et offres spéciales
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="{{ url_for('services') }}" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour aux services
+                        </a>
+                        <button type="submit" class="btn-submit">
+                            <i class="fab fa-whatsapp"></i>
+                            Envoyer via WhatsApp
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="booking-faq">
+    <div class="container">
+        <h2>Questions fréquentes</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h4>Combien de temps avant pour réserver ?</h4>
+                <p>Je recommande de réserver au moins 2-3 semaines à l'avance, surtout pour les mariages et événements.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Que se passe-t-il en cas de mauvais temps ?</h4>
+                <p>Pour les séances extérieures, nous pouvons reporter ou trouver un lieu couvert selon vos préférences.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Quand recevrai-je mes photos ?</h4>
+                <p>Les photos retouchées sont livrées sous 7-14 jours selon le type de prestation.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Puis-je avoir toutes les photos prises ?</h4>
+                <p>Je livre une sélection des meilleures photos retouchées. Les photos brutes peuvent être fournies sur demande.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

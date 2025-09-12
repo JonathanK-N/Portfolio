@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">PRiMA PHOTO</h1>
+            <p class="hero-subtitle">Photographe Professionnel</p>
+            <p class="hero-description">Capturer l'essence de vos moments les plus précieux</p>
+            <a href="{{ url_for('gallery') }}" class="cta-button">Découvrir mon travail</a>
+        </div>
+
+    </div>
+</section>
+
+<section class="featured-work">
+    <div class="container">
+        <h2 class="section-title">Travaux Récents</h2>
+        <div class="gallery-grid">
+            {% for image in images %}
+            <div class="gallery-item" data-category="{{ image.category }}">
+                <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" 
+                     alt="{{ image.title }}" 
+                     onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                <div class="gallery-overlay">
+                    <h3>{{ image.title }}</h3>
+                    <p>{{ image.category|title }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('gallery') }}" class="btn-secondary">Voir toute la galerie</a>
+        </div>
+    </div>
+</section>
+
+<section class="services-preview">
+    <div class="container">
+        <h2 class="section-title">Mes Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-user"></i>
+                <h3>Portraits</h3>
+                <p>Portraits professionnels et artistiques qui révèlent votre personnalité unique.</p>
+                <div class="service-price">À partir de 150€</div>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-heart"></i>
+                <h3>Mariages</h3>
+                <p>Immortaliser votre jour J avec émotion et élégance.</p>
+                <div class="service-price">À partir de 1200€</div>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-building"></i>
+                <h3>Événements</h3>
+                <p>Couverture photographique complète de vos événements professionnels.</p>
+                <div class="service-price">À partir de 400€</div>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-users"></i>
+                <h3>Famille</h3>
+                <p>Séances photo famille pour capturer vos moments précieux ensemble.</p>
+                <div class="service-price">À partir de 200€</div>
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('services') }}" class="btn-primary">Voir tous les services</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

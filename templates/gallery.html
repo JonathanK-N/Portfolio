@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Galerie - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Galerie</h1>
+        <p>Découvrez une sélection de mes meilleurs travaux photographiques</p>
+    </div>
+</section>
+
+<section class="gallery-section">
+    <div class="container">
+        <div class="gallery-filters">
+            <button class="filter-btn {% if current_category == 'all' %}active{% endif %}" data-filter="all">
+                <a href="{{ url_for('gallery', category='all') }}">Tout</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'portrait' %}active{% endif %}" data-filter="portrait">
+                <a href="{{ url_for('gallery', category='portrait') }}">Portraits</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'mariage' %}active{% endif %}" data-filter="mariage">
+                <a href="{{ url_for('gallery', category='mariage') }}">Mariages</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'nature' %}active{% endif %}" data-filter="nature">
+                <a href="{{ url_for('gallery', category='nature') }}">Nature</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'architecture' %}active{% endif %}" data-filter="architecture">
+                <a href="{{ url_for('gallery', category='architecture') }}">Architecture</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'mode' %}active{% endif %}" data-filter="mode">
+                <a href="{{ url_for('gallery', category='mode') }}">Mode</a>
+            </button>
+            <button class="filter-btn {% if current_category == 'evenement' %}active{% endif %}" data-filter="evenement">
+                <a href="{{ url_for('gallery', category='evenement') }}">Événements</a>
+            </button>
+        </div>
+
+        <div class="gallery-grid-full">
+            {% for image in images %}
+            <div class="gallery-item-full" data-category="{{ image.category }}">
+                <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" 
+                     alt="{{ image.title }}"
+                     onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                <div class="gallery-overlay-full">
+                    <h3>{{ image.title }}</h3>
+                    <p>{{ image.category|title }}</p>
+                    <button class="view-btn" onclick="openLightbox('{{ url_for('static', filename='images/gallery/' + image.filename) }}', '{{ image.title }}')">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+{% endblock %}

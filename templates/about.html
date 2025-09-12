@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}À Propos - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>À Propos</h1>
+        <p>Découvrez mon parcours et ma passion pour la photographie</p>
+    </div>
+</section>
+
+<section class="about-content">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text">
+                <h2>Bonjour, je suis PRiMA</h2>
+                <p class="lead">Photographe professionnel passionné par l'art de capturer les moments uniques et les émotions authentiques.</p>
+                
+                <p>Avec plus de 10 ans d'expérience dans le domaine de la photographie, j'ai eu le privilège de travailler avec des clients variés, des particuliers aux entreprises, en passant par les événements les plus prestigieux.</p>
+                
+                <p>Ma philosophie est simple : chaque photo raconte une histoire. Mon rôle est de révéler la beauté naturelle de chaque instant, que ce soit lors d'un portrait intime, d'un mariage romantique, ou d'un événement corporate.</p>
+                
+                <div class="skills">
+                    <h3>Mes Spécialités</h3>
+                    <div class="skills-list">
+                        <div class="skill-item">
+                            <i class="fas fa-user"></i>
+                            <span>Portraits Professionnels</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Photographie de Mariage</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-camera"></i>
+                            <span>Événements Corporate</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fas fa-mountain"></i>
+                            <span>Photographie de Nature</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-image">
+                <img src="{{ url_for('static', filename='images/about-photo.jpg') }}" 
+                     alt="PRiMA - Photographe" 
+                     onerror="this.style.display='none'">
+                <div class="about-stats">
+                    <div class="stat">
+                        <h3>500+</h3>
+                        <p>Projets Réalisés</p>
+                    </div>
+                    <div class="stat">
+                        <h3>10+</h3>
+                        <p>Années d'Expérience</p>
+                    </div>
+                    <div class="stat">
+                        <h3>100%</h3>
+                        <p>Clients Satisfaits</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="equipment">
+    <div class="container">
+        <h2 class="section-title">Mon Équipement</h2>
+        <div class="equipment-grid">
+            <div class="equipment-item">
+                <i class="fas fa-camera"></i>
+                <h3>Appareils Photo</h3>
+                <p>Canon EOS R5, Sony A7R IV</p>
+            </div>
+            <div class="equipment-item">
+                <i class="fas fa-eye"></i>
+                <h3>Objectifs</h3>
+                <p>24-70mm f/2.8, 85mm f/1.4, 16-35mm f/2.8</p>
+            </div>
+            <div class="equipment-item">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Éclairage</h3>
+                <p>Studio Profofoto, Éclairage LED portable</p>
+            </div>
+            <div class="equipment-item">
+                <i class="fas fa-laptop"></i>
+                <h3>Post-Production</h3>
+                <p>Adobe Lightroom, Photoshop CC</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Contact - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Contact</h1>
+        <p>Discutons de votre projet photographique</p>
+    </div>
+</section>
+
+<section class="contact-section">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <h2>Parlons de votre projet</h2>
+                <p>Je serais ravi de discuter de vos besoins photographiques. N'hésitez pas à me contacter pour un devis personnalisé ou pour toute question.</p>
+                
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>contact@primaphoto.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Téléphone</h3>
+                            <p>+33 1 23 45 67 89</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Localisation</h3>
+                            <p>Paris, France</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Disponibilité</h3>
+                            <p>Lun - Ven: 9h - 18h<br>Sam: Sur rendez-vous</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="social-contact">
+                    <h3>Suivez-moi</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-container">
+                <form class="contact-form" method="POST">
+                    <h2>Envoyez-moi un message</h2>
+                    
+                    <div class="form-group">
+                        <label for="name">Nom complet *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Téléphone</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service">Type de service</label>
+                        <select id="service" name="service">
+                            <option value="">Sélectionnez un service</option>
+                            <option value="portrait">Portrait</option>
+                            <option value="mariage">Mariage</option>
+                            <option value="evenement">Événement</option>
+                            <option value="nature">Nature</option>
+                            <option value="architecture">Architecture</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="budget">Budget approximatif</label>
+                        <select id="budget" name="budget">
+                            <option value="">Sélectionnez votre budget</option>
+                            <option value="500-1000">500€ - 1000€</option>
+                            <option value="1000-2000">1000€ - 2000€</option>
+                            <option value="2000-5000">2000€ - 5000€</option>
+                            <option value="5000+">5000€+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" rows="5" required placeholder="Décrivez votre projet, vos attentes, la date souhaitée..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Envoyer le message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

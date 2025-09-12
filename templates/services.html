@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Services - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="services-hero">
+    <div class="services-hero-content">
+        <h1>Mes Services Photographiques</h1>
+        <p>Des prestations sur mesure pour capturer vos moments précieux</p>
+    </div>
+</section>
+
+<section class="services-showcase">
+    <div class="container">
+        <div class="services-grid-pro">
+            {% for service_key, service in services.items() %}
+            <div class="service-card-pro">
+                <div class="service-image">
+                    <img src="{{ url_for('static', filename='images/services/' + service_key + '.jpg') }}" 
+                         alt="{{ service.name }}"
+                         onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                    <div class="service-overlay">
+                        <div class="service-price">{{ service.price }}</div>
+                    </div>
+                </div>
+                
+                <div class="service-content">
+                    <h3>{{ service.name }}</h3>
+                    <div class="service-meta">
+                        <span class="duration"><i class="fas fa-clock"></i> {{ service.duration }}</span>
+                    </div>
+                    <p class="service-description">{{ service.description }}</p>
+                    
+                    <div class="service-includes">
+                        <h4>Inclus :</h4>
+                        <ul>
+                            {% for item in service.includes %}
+                            <li><i class="fas fa-check"></i> {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="service-actions">
+                        <a href="{{ url_for('book_service', service_type=service_key) }}" class="btn-book">
+                            <i class="fas fa-calendar-alt"></i>
+                            Réserver
+                        </a>
+                        <button class="btn-info" onclick="openServiceModal('{{ service_key }}')">
+                            <i class="fas fa-info-circle"></i>
+                            Détails
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="booking-process">
+    <div class="container">
+        <h2 class="section-title">Comment ça marche ?</h2>
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Choisissez votre service</h3>
+                    <p>Sélectionnez le type de prestation qui correspond à vos besoins</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Réservez en ligne</h3>
+                    <p>Remplissez le formulaire avec vos préférences et disponibilités</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Confirmation</h3>
+                    <p>Je vous contacte sous 24h pour confirmer les détails</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Séance photo</h3>
+                    <p>Profitez de votre séance dans une ambiance détendue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <div class="container">
+        <h2 class="section-title">Témoignages Clients</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"Un photographe exceptionnel ! Les photos de notre mariage sont magnifiques, PRiMA a su capturer tous nos moments précieux."</p>
+                </div>
+                <div class="testimonial-author">
+                    <strong>Marie & Thomas</strong>
+                    <span>Mariage 2023</span>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"Séance portrait parfaite ! PRiMA m'a mise à l'aise et le résultat dépasse mes attentes. Je recommande vivement !"</p>
+                </div>
+                <div class="testimonial-author">
+                    <strong>Sophie L.</strong>
+                    <span>Portrait Corporate</span>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"Professionnel, créatif et à l'écoute. Les photos de notre événement d'entreprise sont parfaites pour notre communication."</p>
+                </div>
+                <div class="testimonial-author">
+                    <strong>David M.</strong>
+                    <span>Événement Corporate</span>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Prêt à immortaliser vos moments ?</h2>
+            <p>Contactez-moi pour discuter de votre projet photographique</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('contact') }}" class="btn-primary">Me Contacter</a>
+                <a href="{{ url_for('gallery') }}" class="btn-secondary">Voir mon Travail</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
