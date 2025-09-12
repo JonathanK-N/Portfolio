@@ -81,21 +81,21 @@ PAGE_CONTENT = {
     'about': {
         'title': 'Bonjour, je suis PRiMA',
         'subtitle': 'Photographe professionnel passionné par l\'art de capturer les moments uniques et les émotions authentiques.',
-        'description': 'Avec plus de 10 ans d\'expérience dans le domaine de la photographie, j\'ai eu le privilège de travailler avec des clients variés, des particuliers aux entreprises, en passant par les événements les plus prestigieux.',
+        'description': 'J\'ai eu le privilège de travailler avec des clients variés, des particuliers aux entreprises, en passant par les événements les plus prestigieux.',
         'philosophy': 'Ma philosophie est simple : chaque photo raconte une histoire. Mon rôle est de révéler la beauté naturelle de chaque instant, que ce soit lors d\'un portrait intime, d\'un mariage romantique, ou d\'un événement corporate.',
         'photo': 'about-photo.jpg',
         'stats': {
-            'projects': '500+',
-            'experience': '10+',
+            'projects': '100+',
+            'experience': '2+',
             'satisfaction': '100%'
         }
     },
     'contact': {
         'email': 'contact@primaphoto.com',
-        'phone': '+33 1 23 45 67 89',
-        'location': 'Paris, France',
-        'hours': 'Lun - Ven: 9h - 18h<br>Sam: Sur rendez-vous',
-        'whatsapp': '+33123456789'
+        'phone': '+1 819 674 5823',
+        'location': 'Sherbrooke, QC, Canada',
+        'hours': 'Sur rendez-vous',
+        'whatsapp': '+1 819 674 5823'
     }
 }
 
