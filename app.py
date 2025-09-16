@@ -12,7 +12,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'prima_photo_secret_key_change_in_
 # Configuration pour les images
 UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024  # 30MB max
 
 # Configuration admin
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
@@ -25,14 +25,25 @@ cloudinary.config(
     api_secret=os.environ.get('CLOUDINARY_API_SECRET')
 )
 
-def upload_to_cloudinary(file, folder="prima_photo"):
-    """Upload une image vers Cloudinary"""
+def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
+    """Upload une image vers Cloudinary avec cadrage personnalisé"""
     try:
+        # Mapping des positions de cadrage
+        gravity_map = {
+            'center': 'center',
+            'top': 'north',
+            'bottom': 'south',
+            'left': 'west',
+            'right': 'east'
+        }
+        
+        gravity = gravity_map.get(crop_position, 'center')
+        
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
             transformation=[
-                {'width': 1200, 'height': 800, 'crop': 'limit'},
+                {'width': 800, 'height': 600, 'crop': 'fill', 'gravity': gravity},
                 {'quality': 'auto', 'fetch_format': 'auto'}
             ]
         )
@@ -242,8 +253,11 @@ def admin_add_image():
         file = request.files.get('file')
         
         if file and allowed_file(file.filename):
-            # Upload vers Cloudinary
-            cloudinary_url = upload_to_cloudinary(file, f"prima_photo/gallery/{category}")
+            # Récupérer la position de cadrage
+            crop_position = request.form.get('crop_position', 'center')
+            
+            # Upload vers Cloudinary avec cadrage
+            cloudinary_url = upload_to_cloudinary(file, f"prima_photo/gallery/{category}", crop_position)
             
             if cloudinary_url:
                 new_image = {

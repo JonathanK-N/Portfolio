@@ -68,13 +68,24 @@
                             <div class="file-upload-text">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Cliquez pour sélectionner une image</p>
-                                <small>Formats acceptés: JPG, PNG, GIF (max 16MB)</small>
+                                <small>Formats acceptés: JPG, PNG, GIF (max 30MB)</small>
                             </div>
                         </div>
                     </div>
 
                     <div class="image-preview" id="imagePreview" style="display: none;">
                         <img id="previewImg" src="" alt="Aperçu">
+                        <div class="crop-controls" id="cropControls" style="display: none;">
+                            <h4>Ajuster le cadrage</h4>
+                            <div class="crop-options">
+                                <button type="button" class="crop-btn" data-crop="center">Centré</button>
+                                <button type="button" class="crop-btn" data-crop="top">Haut</button>
+                                <button type="button" class="crop-btn" data-crop="bottom">Bas</button>
+                                <button type="button" class="crop-btn" data-crop="left">Gauche</button>
+                                <button type="button" class="crop-btn" data-crop="right">Droite</button>
+                            </div>
+                            <input type="hidden" id="cropPosition" name="crop_position" value="center">
+                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -89,6 +100,8 @@
     </div>
 
     <script>
+        let selectedCrop = 'center';
+        
         // Aperçu de l'image
         document.getElementById('file').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -97,10 +110,38 @@
                 reader.onload = function(e) {
                     document.getElementById('previewImg').src = e.target.result;
                     document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('cropControls').style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
         });
+        
+        // Gestion du cadrage
+        document.querySelectorAll('.crop-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.crop-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedCrop = this.dataset.crop;
+                document.getElementById('cropPosition').value = selectedCrop;
+                
+                // Appliquer l'aperçu du cadrage
+                const img = document.getElementById('previewImg');
+                img.style.objectPosition = getCropPosition(selectedCrop);
+            });
+        });
+        
+        function getCropPosition(crop) {
+            switch(crop) {
+                case 'top': return 'center top';
+                case 'bottom': return 'center bottom';
+                case 'left': return 'left center';
+                case 'right': return 'right center';
+                default: return 'center center';
+            }
+        }
+        
+        // Sélectionner "Centré" par défaut
+        document.querySelector('[data-crop="center"]').classList.add('active');
     </script>
 </body>
 </html>

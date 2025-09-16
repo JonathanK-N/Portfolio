@@ -1,116 +1,193 @@
-# PRiMA PHOTO - Portfolio Photographe
+# PRiMA PHOTO - Portfolio Photographe Professionnel
 
-Un portfolio professionnel moderne créé avec Flask pour présenter le travail photographique de PRiMA PHOTO.
+🎯 **Portfolio photographique moderne avec administration complète et stockage cloud**
 
-## Fonctionnalités
+Un portfolio professionnel créé avec Flask, incluant un panneau d'administration complet et l'intégration Cloudinary pour le stockage permanent des images.
 
+## ✨ Fonctionnalités Principales
+
+### 🎨 **Frontend**
 - **Design Moderne** : Interface élégante et minimaliste adaptée aux photographes
 - **Responsive** : Compatible avec tous les appareils (desktop, tablette, mobile)
 - **Galerie Interactive** : Système de filtres par catégorie et lightbox
-- **Formulaire de Contact** : Système de contact intégré avec validation
-- **Navigation Fluide** : Animations et transitions modernes
+- **Réservation WhatsApp** : Système de réservation automatique via WhatsApp
+- **Pages Dynamiques** : Contenu modifiable via l'administration
 - **SEO Optimisé** : Structure HTML sémantique
 
-## Structure du Projet
+### 🛠️ **Administration**
+- **Panneau Admin Complet** : Interface d'administration moderne
+- **Gestion Galerie** : Ajout/suppression d'images avec cadrage personnalisé
+- **Gestion Services** : Modification des prix, descriptions, prestations
+- **Gestion Pages** : Édition des pages À Propos et Contact
+- **Upload Intelligent** : Images jusqu'à 30MB avec aperçu et cadrage
+- **Stockage Cloud** : Intégration Cloudinary pour images permanentes
+
+### 📱 **Fonctionnalités Avancées**
+- **WhatsApp Integration** : Réservations automatiques avec détails pré-remplis
+- **Cloudinary CDN** : Images optimisées et servies via CDN mondial
+- **Variables d'Environnement** : Configuration sécurisée pour production
+- **Prêt Railway** : Déploiement one-click sur Railway
+
+## 🏗️ Structure du Projet
 
 ```
 Portfolio/
-├── app.py                 # Application Flask principale
-├── requirements.txt       # Dépendances Python
-├── README.md             # Documentation
-├── templates/            # Templates HTML
-│   ├── base.html         # Template de base
-│   ├── index.html        # Page d'accueil
-│   ├── gallery.html      # Galerie photos
-│   ├── about.html        # Page à propos
-│   └── contact.html      # Page contact
-└── static/              # Fichiers statiques
+├── app.py                    # Application Flask principale
+├── requirements.txt          # Dépendances Python + Cloudinary
+├── Procfile                  # Configuration Railway
+├── railway.json              # Configuration déploiement
+├── runtime.txt               # Version Python
+├── .gitignore               # Fichiers à ignorer
+├── DEPLOYMENT.md            # Guide de déploiement
+├── CLOUDINARY_SETUP.md      # Guide Cloudinary
+├── templates/               # Templates HTML
+│   ├── base.html            # Template de base
+│   ├── index.html           # Page d'accueil
+│   ├── gallery.html         # Galerie photos
+│   ├── about.html           # Page à propos (dynamique)
+│   ├── contact.html         # Page contact (dynamique)
+│   ├── services.html        # Page services
+│   ├── book_service.html    # Formulaire réservation
+│   └── admin/               # Templates administration
+│       ├── login.html       # Connexion admin
+│       ├── dashboard.html   # Tableau de bord
+│       ├── gallery.html     # Gestion galerie
+│       ├── add_image.html   # Ajout d'images
+│       ├── services.html    # Gestion services
+│       ├── edit_service.html # Édition service
+│       ├── pages.html       # Gestion pages
+│       ├── edit_about.html  # Édition À Propos
+│       └── edit_contact.html # Édition Contact
+└── static/                  # Fichiers statiques
     ├── css/
-    │   └── style.css     # Styles CSS
+    │   ├── style.css        # Styles frontend
+    │   └── admin.css        # Styles administration
     ├── js/
-    │   └── script.js     # JavaScript
-    └── images/           # Images du site
-        └── gallery/      # Photos de la galerie
+    │   └── script.js        # JavaScript frontend
+    └── images/              # Images locales (backup)
 ```
 
-## Installation
+## 🚀 Installation et Utilisation
 
-1. **Cloner ou télécharger le projet**
-2. **Installer Python** (version 3.7 ou supérieure)
-3. **Installer les dépendances** :
+### **Installation Locale**
+
+1. **Cloner le projet**
+   ```bash
+   git clone https://github.com/JonathanK-N/prima-photo-portfolio.git
+   cd prima-photo-portfolio
+   ```
+
+2. **Installer les dépendances**
    ```bash
    pip install -r requirements.txt
    ```
 
-## Utilisation
-
-1. **Lancer l'application** :
+3. **Lancer l'application**
    ```bash
    python app.py
    ```
 
-2. **Ouvrir votre navigateur** et aller à : `http://localhost:5000`
+4. **Accéder au site**
+   - Site : `http://localhost:5000`
+   - Admin : `http://localhost:5000/admin`
+   - Identifiants : `admin` / `prima2024`
 
-## Personnalisation
+### **Déploiement Production (Railway)**
 
-### Ajouter des Photos
-
-1. Placez vos photos dans le dossier `static/images/gallery/`
-2. Modifiez la liste `GALLERY_IMAGES` dans `app.py` :
-   ```python
-   GALLERY_IMAGES = [
-       {'filename': 'votre-photo.jpg', 'title': 'Titre', 'category': 'portrait'},
-       # Ajoutez vos photos ici
-   ]
+1. **Configurer Cloudinary** (voir `CLOUDINARY_SETUP.md`)
+2. **Variables d'environnement Railway** :
    ```
+   SECRET_KEY=votre_cle_secrete_forte
+   ADMIN_USERNAME=votre_admin
+   ADMIN_PASSWORD=votre_mot_de_passe
+   CLOUDINARY_CLOUD_NAME=votre_cloud_name
+   CLOUDINARY_API_KEY=votre_api_key
+   CLOUDINARY_API_SECRET=votre_api_secret
+   ```
+3. **Déployer** : Connecter le repo GitHub à Railway
 
-### Modifier les Informations
+## 🎛️ Administration
 
-- **Nom du photographe** : Modifiez "PRiMA PHOTO" dans les templates
-- **Informations de contact** : Éditez `templates/contact.html` et `templates/base.html`
-- **À propos** : Personnalisez `templates/about.html`
+### **Accès Admin**
+- **URL** : `/admin`
+- **Fonctionnalités** :
+  - 📊 Tableau de bord avec statistiques
+  - 🖼️ Gestion complète de la galerie
+  - ⚙️ Configuration des services et tarifs
+  - 📄 Édition des pages À Propos et Contact
+  - 📱 Configuration WhatsApp
 
-### Personnaliser le Design
+### **Gestion des Images**
+- **Upload** : Jusqu'à 30MB par image
+- **Cadrage** : 5 options (centré, haut, bas, gauche, droite)
+- **Stockage** : Cloudinary avec CDN mondial
+- **Formats** : JPG, PNG, GIF
+- **Optimisation** : Automatique (WebP, compression)
 
-- **Couleurs** : Modifiez les variables CSS dans `static/css/style.css`
-- **Polices** : Changez les `font-family` dans le CSS
-- **Layout** : Ajustez les grilles CSS Grid dans le fichier de styles
+## 📋 Catégories Supportées
 
-## Catégories de Photos
+- **Portrait** : Portraits professionnels et artistiques
+- **Mariage** : Photographie de mariage complète
+- **Nature** : Paysages et photographie nature
+- **Architecture** : Photographie architecturale
+- **Mode** : Fashion et lifestyle
+- **Événement** : Événements corporate et privés
 
-Le site supporte les catégories suivantes :
-- Portrait
-- Mariage
-- Nature
-- Architecture
-- Mode
-- Événement
+## 🛡️ Sécurité
 
-Vous pouvez ajouter de nouvelles catégories en modifiant :
-1. La liste `GALLERY_IMAGES` dans `app.py`
-2. Les filtres dans `templates/gallery.html`
+- **Variables d'environnement** pour les secrets
+- **Sessions sécurisées** pour l'administration
+- **Validation des fichiers** uploadés
+- **Protection CSRF** intégrée Flask
+- **Stockage cloud sécurisé** Cloudinary
 
-## Déploiement
+## 🔧 Technologies
 
-Pour déployer en production :
+### **Backend**
+- **Flask 2.3.3** : Framework web Python
+- **Cloudinary** : Stockage et optimisation d'images
+- **Gunicorn** : Serveur WSGI pour production
+- **Werkzeug** : Utilitaires web et sécurité
 
-1. **Configurez une clé secrète sécurisée** dans `app.py`
-2. **Désactivez le mode debug** : `app.run(debug=False)`
-3. **Utilisez un serveur WSGI** comme Gunicorn
-4. **Configurez un serveur web** (Nginx, Apache)
+### **Frontend**
+- **HTML5 Sémantique** : Structure moderne
+- **CSS3 Grid/Flexbox** : Layout responsive
+- **JavaScript Vanilla** : Interactions fluides
+- **Font Awesome 6** : Icônes professionnelles
 
-## Technologies Utilisées
+### **Déploiement**
+- **Railway** : Plateforme de déploiement
+- **Git** : Contrôle de version
+- **Variables d'environnement** : Configuration sécurisée
 
-- **Backend** : Flask (Python)
-- **Frontend** : HTML5, CSS3, JavaScript
-- **Icons** : Font Awesome
-- **Design** : CSS Grid, Flexbox
-- **Responsive** : Media Queries
+## 📱 URLs Principales
 
-## Support
+- **Accueil** : `/`
+- **Galerie** : `/galerie`
+- **Services** : `/services`
+- **À Propos** : `/a-propos`
+- **Contact** : `/contact`
+- **Administration** : `/admin`
+- **Réservation** : `/reserver/<service>`
 
-Pour toute question ou personnalisation, consultez la documentation Flask officielle ou contactez le développeur.
+## 🎯 Fonctionnalités Uniques
 
-## Licence
+- **Réservation WhatsApp** : Messages pré-formatés automatiques
+- **Cadrage Intelligent** : Aperçu et ajustement avant upload
+- **Administration Complète** : Gestion 100% du contenu
+- **Stockage Permanent** : Plus de perte d'images lors des redéploiements
+- **Optimisation Automatique** : Images servies via CDN mondial
+
+## 📞 Support
+
+- **Documentation** : Fichiers `DEPLOYMENT.md` et `CLOUDINARY_SETUP.md`
+- **Issues** : GitHub Issues pour les bugs
+- **Configuration** : Variables d'environnement documentées
+
+## 📄 Licence
 
 Ce projet est libre d'utilisation pour des projets personnels et commerciaux.
+
+---
+
+**Développé avec ❤️ pour les photographes professionnels**

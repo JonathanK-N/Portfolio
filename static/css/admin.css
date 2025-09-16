@@ -717,6 +717,56 @@ body {
     margin: 0;
 }
 
+/* Crop Controls */
+.crop-controls {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.crop-controls h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.crop-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.crop-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.crop-btn:hover {
+    border-color: #e74c3c;
+}
+
+.crop-btn.active {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
+
+.image-preview img {
+    width: 100%;
+    max-width: 400px;
+    height: 250px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    transition: object-position 0.3s ease;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-sidebar {
