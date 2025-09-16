@@ -8,3 +8,4 @@ blinker==1.6.3
 requests==2.32.4
 Pillow==11.3.0
 gunicorn==21.2.0
+cloudinary==1.36.0

@@ -93,7 +93,7 @@
                 <div class="images-grid">
                     {% for image in images[-6:] %}
                     <div class="image-card">
-                        <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" alt="{{ image.title }}">
+                        <img src="{{ image.url }}" alt="{{ image.title }}">
                         <div class="image-info">
                             <h4>{{ image.title }}</h4>
                             <span class="category">{{ image.category|title }}</span>

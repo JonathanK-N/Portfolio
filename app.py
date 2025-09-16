@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 import os
 import json
 from werkzeug.utils import secure_filename
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'prima_photo_secret_key_change_in_production')
@@ -15,48 +18,47 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'prima2024')
 
+# Configuration Cloudinary
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
+
+def upload_to_cloudinary(file, folder="prima_photo"):
+    """Upload une image vers Cloudinary"""
+    try:
+        result = cloudinary.uploader.upload(
+            file,
+            folder=folder,
+            transformation=[
+                {'width': 1200, 'height': 800, 'crop': 'limit'},
+                {'quality': 'auto', 'fetch_format': 'auto'}
+            ]
+        )
+        return result['secure_url']
+    except Exception as e:
+        print(f"Erreur upload Cloudinary: {e}")
+        return None
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Données du portfolio professionnel
+# Données du portfolio professionnel (URLs Cloudinary)
 GALLERY_IMAGES = [
     # Portraits
-    {'filename': 'portrait-1.jpg', 'title': 'Portrait Corporate Élégant', 'category': 'portrait'},
-    {'filename': 'portrait-2.jpg', 'title': 'Portrait Artistique en Studio', 'category': 'portrait'},
-    {'filename': 'portrait-3.jpg', 'title': 'Portrait Professionnel Femme', 'category': 'portrait'},
-    {'filename': 'portrait-4.jpg', 'title': 'Portrait Homme d\'Affaires', 'category': 'portrait'},
+    {'url': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop', 'title': 'Portrait Corporate Élégant', 'category': 'portrait'},
+    {'url': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=600&fit=crop', 'title': 'Portrait Artistique en Studio', 'category': 'portrait'},
+    {'url': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=600&fit=crop', 'title': 'Portrait Professionnel Femme', 'category': 'portrait'},
+    {'url': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=600&fit=crop', 'title': 'Portrait Homme d\'Affaires', 'category': 'portrait'},
     
     # Mariages
-    {'filename': 'mariage-1.jpg', 'title': 'Cérémonie Romantique', 'category': 'mariage'},
-    {'filename': 'mariage-2.jpg', 'title': 'Premier Regard', 'category': 'mariage'},
-    {'filename': 'mariage-3.jpg', 'title': 'Échange des Vœux', 'category': 'mariage'},
-    {'filename': 'mariage-4.jpg', 'title': 'Danse des Mariés', 'category': 'mariage'},
-    
-    # Nature
-    {'filename': 'nature-1.jpg', 'title': 'Paysage Montagneux', 'category': 'nature'},
-    {'filename': 'nature-2.jpg', 'title': 'Forêt Mystique', 'category': 'nature'},
-    {'filename': 'nature-3.jpg', 'title': 'Coucher de Soleil', 'category': 'nature'},
-    {'filename': 'nature-4.jpg', 'title': 'Reflets sur l\'Eau', 'category': 'nature'},
-    
-    # Architecture
-    {'filename': 'architecture-1.jpg', 'title': 'Gratte-Ciel Moderne', 'category': 'architecture'},
-    {'filename': 'architecture-2.jpg', 'title': 'Détails Architecturaux', 'category': 'architecture'},
-    {'filename': 'architecture-3.jpg', 'title': 'Perspective Urbaine', 'category': 'architecture'},
-    {'filename': 'architecture-4.jpg', 'title': 'Jeux d\'Ombres', 'category': 'architecture'},
-    
-    # Mode
-    {'filename': 'mode-1.jpg', 'title': 'Fashion Editorial', 'category': 'mode'},
-    {'filename': 'mode-2.jpg', 'title': 'Street Style Urbain', 'category': 'mode'},
-    {'filename': 'mode-3.jpg', 'title': 'Haute Couture', 'category': 'mode'},
-    {'filename': 'mode-4.jpg', 'title': 'Mode Lifestyle', 'category': 'mode'},
-    
-    # Événements
-    {'filename': 'evenement-1.jpg', 'title': 'Conférence Corporate', 'category': 'evenement'},
-    {'filename': 'evenement-2.jpg', 'title': 'Gala de Prestige', 'category': 'evenement'},
-    {'filename': 'evenement-3.jpg', 'title': 'Lancement Produit', 'category': 'evenement'},
-    {'filename': 'evenement-4.jpg', 'title': 'Networking Event', 'category': 'evenement'}
+    {'url': 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop', 'title': 'Cérémonie Romantique', 'category': 'mariage'},
+    {'url': 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop', 'title': 'Premier Regard', 'category': 'mariage'},
+    {'url': 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop', 'title': 'Échange des Vœux', 'category': 'mariage'},
+    {'url': 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop', 'title': 'Danse des Mariés', 'category': 'mariage'}
 ]
 
 @app.route('/')
@@ -83,7 +85,7 @@ PAGE_CONTENT = {
         'subtitle': 'Photographe professionnel passionné par l\'art de capturer les moments uniques et les émotions authentiques.',
         'description': 'J\'ai eu le privilège de travailler avec des clients variés, des particuliers aux entreprises, en passant par les événements les plus prestigieux.',
         'philosophy': 'Ma philosophie est simple : chaque photo raconte une histoire. Mon rôle est de révéler la beauté naturelle de chaque instant, que ce soit lors d\'un portrait intime, d\'un mariage romantique, ou d\'un événement corporate.',
-        'photo': 'about-photo.jpg',
+        'photo': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=800&fit=crop',
         'stats': {
             'projects': '100+',
             'experience': '2+',
@@ -240,18 +242,21 @@ def admin_add_image():
         file = request.files.get('file')
         
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join('static/images/gallery', filename))
+            # Upload vers Cloudinary
+            cloudinary_url = upload_to_cloudinary(file, f"prima_photo/gallery/{category}")
             
-            new_image = {
-                'filename': filename,
-                'title': title,
-                'category': category
-            }
-            GALLERY_IMAGES.append(new_image)
-            
-            flash('Image ajoutée avec succès !', 'success')
-            return redirect(url_for('admin_gallery'))
+            if cloudinary_url:
+                new_image = {
+                    'url': cloudinary_url,
+                    'title': title,
+                    'category': category
+                }
+                GALLERY_IMAGES.append(new_image)
+                
+                flash('Image ajoutée avec succès !', 'success')
+                return redirect(url_for('admin_gallery'))
+            else:
+                flash('Erreur lors de l\'upload', 'error')
         else:
             flash('Fichier invalide', 'error')
     
@@ -263,12 +268,7 @@ def admin_delete_image(image_id):
         return redirect(url_for('admin_login'))
     
     if 0 <= image_id < len(GALLERY_IMAGES):
-        deleted_image = GALLERY_IMAGES.pop(image_id)
-        # Supprimer le fichier physique
-        try:
-            os.remove(os.path.join('static/images/gallery', deleted_image['filename']))
-        except:
-            pass
+        GALLERY_IMAGES.pop(image_id)
         flash('Image supprimée !', 'success')
     
     return redirect(url_for('admin_gallery'))
@@ -330,9 +330,9 @@ def admin_edit_about():
         # Gestion de la photo
         file = request.files.get('photo')
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join('static/images', filename))
-            PAGE_CONTENT['about']['photo'] = filename
+            cloudinary_url = upload_to_cloudinary(file, "prima_photo/about")
+            if cloudinary_url:
+                PAGE_CONTENT['about']['photo'] = cloudinary_url
         
         flash('Page À propos mise à jour !', 'success')
         return redirect(url_for('admin_pages'))

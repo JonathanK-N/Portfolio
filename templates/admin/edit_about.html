@@ -66,8 +66,8 @@
                     <div class="form-group">
                         <label for="photo">Photo du photographe</label>
                         <div class="current-photo">
-                            <img src="{{ url_for('static', filename='images/' + content.photo) }}" alt="Photo actuelle" style="max-width: 200px; border-radius: 10px;">
-                            <p>Photo actuelle: {{ content.photo }}</p>
+                            <img src="{{ content.photo }}" alt="Photo actuelle" style="max-width: 200px; border-radius: 10px;">
+                            <p>Photo actuelle</p>
                         </div>
                         <div class="file-upload">
                             <input type="file" id="photo" name="photo" accept="image/*">

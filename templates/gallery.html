@@ -39,13 +39,12 @@
         <div class="gallery-grid-full">
             {% for image in images %}
             <div class="gallery-item-full" data-category="{{ image.category }}">
-                <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" 
-                     alt="{{ image.title }}"
-                     onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                <img src="{{ image.url }}" 
+                     alt="{{ image.title }}">
                 <div class="gallery-overlay-full">
                     <h3>{{ image.title }}</h3>
                     <p>{{ image.category|title }}</p>
-                    <button class="view-btn" onclick="openLightbox('{{ url_for('static', filename='images/gallery/' + image.filename) }}', '{{ image.title }}')">
+                    <button class="view-btn" onclick="openLightbox('{{ image.url }}', '{{ image.title }}')">
                         <i class="fas fa-expand"></i>
                     </button>
                 </div>

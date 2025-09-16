@@ -45,9 +45,8 @@
             </div>
             
             <div class="about-image">
-                <img src="{{ url_for('static', filename='images/' + content.photo) }}" 
-                     alt="PRiMA - Photographe" 
-                     onerror="this.style.display='none'">
+                <img src="{{ content.photo }}" 
+                     alt="PRiMA - Photographe">
                 <div class="about-stats">
                     <div class="stat">
                         <h3>{{ content.stats.projects }}</h3>

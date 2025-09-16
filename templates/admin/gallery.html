@@ -54,7 +54,7 @@
                 {% for image in images %}
                 <div class="admin-image-card" data-category="{{ image.category }}">
                     <div class="image-preview">
-                        <img src="{{ url_for('static', filename='images/gallery/' + image.filename) }}" alt="{{ image.title }}">
+                        <img src="{{ image.url }}" alt="{{ image.title }}">
                         <div class="image-overlay">
                             <button class="btn-danger" onclick="deleteImage({{ loop.index0 }}, '{{ image.title }}')">
                                 <i class="fas fa-trash"></i>
@@ -64,7 +64,7 @@
                     <div class="image-details">
                         <h4>{{ image.title }}</h4>
                         <span class="category-tag category-{{ image.category }}">{{ image.category|title }}</span>
-                        <p class="filename">{{ image.filename }}</p>
+                        <p class="filename">Cloudinary</p>
                     </div>
                 </div>
                 {% endfor %}
