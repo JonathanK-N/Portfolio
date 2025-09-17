@@ -36,3 +36,6 @@ instance/
 
 .DS_Store
 Thumbs.db
+
+# Données du portfolio
+portfolio_data.json

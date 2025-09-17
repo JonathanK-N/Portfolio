@@ -16,9 +16,8 @@
             {% for service_key, service in services.items() %}
             <div class="service-card-pro">
                 <div class="service-image">
-                    <img src="{{ url_for('static', filename='images/services/' + service_key + '.jpg') }}" 
-                         alt="{{ service.name }}"
-                         onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                    <img src="{{ service.image if service.image else url_for('static', filename='images/placeholder.jpg') }}" 
+                         alt="{{ service.name }}">
                     <div class="service-overlay">
                         <div class="service-price">{{ service.price }}</div>
                     </div>

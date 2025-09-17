@@ -42,7 +42,14 @@
             {% endwith %}
 
             <div class="form-container">
-                <form method="POST" class="admin-form">
+                {% if service.image %}
+                <div class="current-image">
+                    <h3>Image actuelle</h3>
+                    <img src="{{ service.image }}" alt="Image du service" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 10px;">
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" class="admin-form">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="name">Nom du service *</label>
@@ -63,6 +70,22 @@
                     <div class="form-group">
                         <label for="description">Description *</label>
                         <textarea id="description" name="description" rows="3" required>{{ service.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service_image">Image du service</label>
+                        <div class="file-upload">
+                            <input type="file" id="service_image" name="service_image" accept="image/*">
+                            <div class="file-upload-text">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Cliquez pour changer l'image</p>
+                                <small>Formats acceptés: JPG, PNG, GIF (max 30MB)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImg" src="" alt="Aperçu" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 10px;">
                     </div>
 
                     <div class="form-group">
@@ -121,6 +144,19 @@
                 item.querySelector('input').focus();
             }
         }
+
+        // Aperçu de l'image
+        document.getElementById('service_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 </body>
 </html>

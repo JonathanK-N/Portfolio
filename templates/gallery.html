@@ -22,14 +22,8 @@
             <button class="filter-btn {% if current_category == 'mariage' %}active{% endif %}" data-filter="mariage">
                 <a href="{{ url_for('gallery', category='mariage') }}">Mariages</a>
             </button>
-            <button class="filter-btn {% if current_category == 'nature' %}active{% endif %}" data-filter="nature">
-                <a href="{{ url_for('gallery', category='nature') }}">Nature</a>
-            </button>
-            <button class="filter-btn {% if current_category == 'architecture' %}active{% endif %}" data-filter="architecture">
-                <a href="{{ url_for('gallery', category='architecture') }}">Architecture</a>
-            </button>
-            <button class="filter-btn {% if current_category == 'mode' %}active{% endif %}" data-filter="mode">
-                <a href="{{ url_for('gallery', category='mode') }}">Mode</a>
+            <button class="filter-btn {% if current_category == 'anniversaire' %}active{% endif %}" data-filter="anniversaire">
+                <a href="{{ url_for('gallery', category='anniversaire') }}">Anniversaires</a>
             </button>
             <button class="filter-btn {% if current_category == 'evenement' %}active{% endif %}" data-filter="evenement">
                 <a href="{{ url_for('gallery', category='evenement') }}">Événements</a>
