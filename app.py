@@ -105,7 +105,8 @@ DEFAULT_DATA = {
             'whatsapp': '+1 819 674 5823'
         },
         'hero': {
-            'background_image': 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1920&h=1080&fit=crop'
+            'background_image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=1920&h=1080&fit=crop'
+
         }
     },
     'gallery_images': [
