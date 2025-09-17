@@ -75,19 +75,6 @@
         </main>
     </div>
 
-    <script>
-        // Aperçu de l'image
-        document.getElementById('background_image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/admin-hero.js') }}"></script>
 </body>
 </html>
