@@ -104,7 +104,7 @@ PAGE_CONTENT = {
         }
     },
     'contact': {
-        'email': 'contact@primaphoto.com',
+        'email': 'primaphotoproduction@gmail.com',
         'phone': '+1 819 674 5823',
         'location': 'Sherbrooke, QC, Canada',
         'hours': 'Sur rendez-vous',
