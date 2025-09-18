@@ -1,8 +1,7 @@
-// Script pour l'ajout d'images dans la galerie avec rognage
+// Script pour l'ajout d'images dans la galerie
 document.addEventListener('DOMContentLoaded', function() {
-    let cropper = null;
     
-    // Aperçu de l'image avec rognage
+    // Aperçu de l'image
     const fileInput = document.getElementById('file');
     if (fileInput) {
         fileInput.addEventListener('change', function(e) {
@@ -10,47 +9,42 @@ document.addEventListener('DOMContentLoaded', function() {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const previewImg = document.getElementById('previewImg');
-                    previewImg.src = e.target.result;
+                    document.getElementById('previewImg').src = e.target.result;
                     document.getElementById('imagePreview').style.display = 'block';
-                    
-                    // Attendre que l'image soit chargée
-                    previewImg.onload = function() {
-                        // Détruire l'ancien cropper s'il existe
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-                        
-                        // Créer le nouveau cropper (ratio 4:3)
-                        cropper = new ImageCropper(previewImg, 4/3);
-                        document.getElementById('cropControls').style.display = 'block';
-                        
-                        // Mettre à jour les données de rognage
-                        updateCropData();
-                    };
+                    document.getElementById('cropControls').style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
         });
     }
     
-    // Fonction globale pour réinitialiser le rognage
-    window.resetCrop = function() {
-        if (cropper) {
-            cropper.resetCrop();
-            updateCropData();
-        }
-    };
+    // Gestion du cadrage
+    document.querySelectorAll('.crop-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.crop-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const selectedCrop = this.dataset.crop;
+            document.getElementById('cropPosition').value = selectedCrop;
+            
+            // Appliquer l'aperçu du cadrage
+            const img = document.getElementById('previewImg');
+            img.style.objectPosition = getCropPosition(selectedCrop);
+        });
+    });
     
-    function updateCropData() {
-        if (cropper) {
-            const cropData = cropper.getCropData();
-            document.getElementById('cropData').value = JSON.stringify(cropData);
+    function getCropPosition(crop) {
+        switch(crop) {
+            case 'top': return 'center top';
+            case 'bottom': return 'center bottom';
+            case 'left': return 'left center';
+            case 'right': return 'right center';
+            default: return 'center center';
         }
     }
     
-    // Mettre à jour les données de rognage quand on bouge la zone
-    document.addEventListener('mouseup', function() {
-        setTimeout(updateCropData, 100);
-    });
+    // Sélectionner "Centré" par défaut
+    const centerBtn = document.querySelector('[data-crop="center"]');
+    if (centerBtn) {
+        centerBtn.classList.add('active');
+    }
 });

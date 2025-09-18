@@ -52,39 +52,32 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
         print(f"Erreur upload Cloudinary: {e}")
         return None
 
-def upload_to_cloudinary_with_crop(file, folder="prima_photo", crop_data=None):
-    """Upload une image vers Cloudinary avec rognage personnalisé"""
+def upload_original_with_position(file, folder="prima_photo", crop_position="center"):
+    """Upload une image vers Cloudinary en taille originale avec position de cadrage"""
     try:
-        transformations = []
+        # Mapping des positions de cadrage
+        gravity_map = {
+            'center': 'center',
+            'top': 'north',
+            'bottom': 'south',
+            'left': 'west',
+            'right': 'east'
+        }
         
-        # Si des données de rognage sont fournies
-        if crop_data:
-            try:
-                crop_info = json.loads(crop_data)
-                transformations.append({
-                    'x': crop_info['x'],
-                    'y': crop_info['y'],
-                    'width': crop_info['width'],
-                    'height': crop_info['height'],
-                    'crop': 'crop'
-                })
-            except:
-                pass
-        
-        # Redimensionner au format final
-        transformations.extend([
-            {'width': 1200, 'height': 900, 'crop': 'fill'},
-            {'quality': 'auto', 'fetch_format': 'auto'}
-        ])
+        gravity = gravity_map.get(crop_position, 'center')
         
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
-            transformation=transformations
+            transformation=[
+                {'quality': 'auto', 'fetch_format': 'auto'}
+            ],
+            # Stocker la position pour usage futur
+            context=f"gravity={gravity}"
         )
         return result['secure_url']
     except Exception as e:
-        print(f"Erreur upload Cloudinary avec rognage: {e}")
+        print(f"Erreur upload Cloudinary: {e}")
         return None
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -323,11 +316,11 @@ def admin_add_image():
         file = request.files.get('file')
         
         if file and allowed_file(file.filename):
-            # Récupérer les données de rognage
-            crop_data = request.form.get('crop_data')
+            # Récupérer la position de cadrage
+            crop_position = request.form.get('crop_position', 'center')
             
-            # Upload vers Cloudinary avec rognage personnalisé
-            cloudinary_url = upload_to_cloudinary_with_crop(file, f"prima_photo/gallery/{category}", crop_data)
+            # Upload vers Cloudinary sans redimensionnement forcé
+            cloudinary_url = upload_original_with_position(file, f"prima_photo/gallery/{category}", crop_position)
             
             if cloudinary_url:
                 new_image = {
