@@ -52,6 +52,41 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
         print(f"Erreur upload Cloudinary: {e}")
         return None
 
+def upload_to_cloudinary_with_crop(file, folder="prima_photo", crop_data=None):
+    """Upload une image vers Cloudinary avec rognage personnalisé"""
+    try:
+        transformations = []
+        
+        # Si des données de rognage sont fournies
+        if crop_data:
+            try:
+                crop_info = json.loads(crop_data)
+                transformations.append({
+                    'x': crop_info['x'],
+                    'y': crop_info['y'],
+                    'width': crop_info['width'],
+                    'height': crop_info['height'],
+                    'crop': 'crop'
+                })
+            except:
+                pass
+        
+        # Redimensionner au format final
+        transformations.extend([
+            {'width': 1200, 'height': 900, 'crop': 'fill'},
+            {'quality': 'auto', 'fetch_format': 'auto'}
+        ])
+        
+        result = cloudinary.uploader.upload(
+            file,
+            folder=folder,
+            transformation=transformations
+        )
+        return result['secure_url']
+    except Exception as e:
+        print(f"Erreur upload Cloudinary avec rognage: {e}")
+        return None
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -288,11 +323,11 @@ def admin_add_image():
         file = request.files.get('file')
         
         if file and allowed_file(file.filename):
-            # Récupérer la position de cadrage
-            crop_position = request.form.get('crop_position', 'center')
+            # Récupérer les données de rognage
+            crop_data = request.form.get('crop_data')
             
-            # Upload vers Cloudinary avec cadrage
-            cloudinary_url = upload_to_cloudinary(file, f"prima_photo/gallery/{category}", crop_position)
+            # Upload vers Cloudinary avec rognage personnalisé
+            cloudinary_url = upload_to_cloudinary_with_crop(file, f"prima_photo/gallery/{category}", crop_data)
             
             if cloudinary_url:
                 new_image = {

@@ -72,17 +72,15 @@
                     </div>
 
                     <div class="image-preview" id="imagePreview" style="display: none;">
-                        <img id="previewImg" src="" alt="Aperçu">
+                        <div class="crop-container">
+                            <img id="previewImg" src="" alt="Aperçu">
+                        </div>
                         <div class="crop-controls" id="cropControls" style="display: none;">
-                            <h4>Ajuster le cadrage</h4>
-                            <div class="crop-options">
-                                <button type="button" class="crop-btn" data-crop="center">Centré</button>
-                                <button type="button" class="crop-btn" data-crop="top">Haut</button>
-                                <button type="button" class="crop-btn" data-crop="bottom">Bas</button>
-                                <button type="button" class="crop-btn" data-crop="left">Gauche</button>
-                                <button type="button" class="crop-btn" data-crop="right">Droite</button>
+                            <h4>Rogner l'image (ratio 4:3)</h4>
+                            <div class="crop-actions">
+                                <button type="button" class="btn-crop-reset" onclick="resetCrop()">Réinitialiser</button>
                             </div>
-                            <input type="hidden" id="cropPosition" name="crop_position" value="center">
+                            <input type="hidden" id="cropData" name="crop_data" value="">
                         </div>
                     </div>
 
@@ -97,6 +95,7 @@
         </main>
     </div>
 
+    <script src="{{ url_for('static', filename='js/image-cropper.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin-gallery.js') }}"></script>
 </body>
 </html>
