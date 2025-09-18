@@ -52,33 +52,42 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
         print(f"Erreur upload Cloudinary: {e}")
         return None
 
-def upload_original_with_position(file, folder="prima_photo", crop_position="center"):
-    """Upload une image vers Cloudinary en taille originale avec position de cadrage"""
+def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, target_height=900):
+    """Upload avec IA Cloudinary pour optimisation automatique"""
     try:
-        # Mapping des positions de cadrage
-        gravity_map = {
-            'center': 'center',
-            'top': 'north',
-            'bottom': 'south',
-            'left': 'west',
-            'right': 'east'
-        }
-        
-        gravity = gravity_map.get(crop_position, 'center')
-        
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
             transformation=[
-                {'quality': 'auto', 'fetch_format': 'auto'}
+                # IA pour détection automatique du sujet principal
+                {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': 'auto'},
+                # Optimisation automatique de la qualité et du format
+                {'quality': 'auto:best', 'fetch_format': 'auto'},
+                # Amélioration automatique de l'image
+                {'effect': 'auto_contrast'},
+                {'effect': 'auto_color'}
             ],
-            # Stocker la position pour usage futur
-            context=f"gravity={gravity}"
+            # Activer l'analyse IA
+            detection='adv_face',
+            auto_tagging=0.7
         )
         return result['secure_url']
     except Exception as e:
-        print(f"Erreur upload Cloudinary: {e}")
-        return None
+        print(f"Erreur upload Cloudinary avec IA: {e}")
+        # Fallback sans IA si erreur
+        try:
+            result = cloudinary.uploader.upload(
+                file,
+                folder=folder,
+                transformation=[
+                    {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': 'center'},
+                    {'quality': 'auto', 'fetch_format': 'auto'}
+                ]
+            )
+            return result['secure_url']
+        except Exception as e2:
+            print(f"Erreur upload Cloudinary fallback: {e2}")
+            return None
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -316,11 +325,8 @@ def admin_add_image():
         file = request.files.get('file')
         
         if file and allowed_file(file.filename):
-            # Récupérer la position de cadrage
-            crop_position = request.form.get('crop_position', 'center')
-            
-            # Upload vers Cloudinary sans redimensionnement forcé
-            cloudinary_url = upload_original_with_position(file, f"prima_photo/gallery/{category}", crop_position)
+            # Upload avec IA pour optimisation automatique
+            cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/gallery/{category}")
             
             if cloudinary_url:
                 new_image = {
@@ -380,10 +386,10 @@ def admin_edit_service(service_key):
         SERVICES[service_key]['duration'] = request.form.get('duration')
         SERVICES[service_key]['description'] = request.form.get('description')
         
-        # Gestion de l'image
+        # Gestion de l'image avec IA
         file = request.files.get('service_image')
         if file and allowed_file(file.filename):
-            cloudinary_url = upload_to_cloudinary(file, f"prima_photo/services/{service_key}", "center")
+            cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/services/{service_key}", 400, 300)
             if cloudinary_url:
                 SERVICES[service_key]['image'] = cloudinary_url
         
@@ -424,10 +430,10 @@ def admin_edit_about():
         PAGE_CONTENT['about']['stats']['experience'] = request.form.get('experience')
         PAGE_CONTENT['about']['stats']['satisfaction'] = request.form.get('satisfaction')
         
-        # Gestion de la photo
+        # Gestion de la photo avec IA
         file = request.files.get('photo')
         if file and allowed_file(file.filename):
-            cloudinary_url = upload_to_cloudinary(file, "prima_photo/about")
+            cloudinary_url = upload_with_ai_optimization(file, "prima_photo/about", 600, 800)
             if cloudinary_url:
                 PAGE_CONTENT['about']['photo'] = cloudinary_url
         
@@ -469,7 +475,7 @@ def admin_edit_hero():
     if request.method == 'POST':
         file = request.files.get('background_image')
         if file and allowed_file(file.filename):
-            cloudinary_url = upload_to_cloudinary(file, "prima_photo/hero", "center")
+            cloudinary_url = upload_with_ai_optimization(file, "prima_photo/hero", 1920, 1080)
             if cloudinary_url:
                 PAGE_CONTENT['hero']['background_image'] = cloudinary_url
                 
