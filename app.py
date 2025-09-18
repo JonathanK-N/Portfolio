@@ -22,10 +22,8 @@ app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024  # 30MB max
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'prima2024')
 
-# Configuration OpenAI
-client = OpenAI(
-    api_key=os.environ.get('OPENAI_API_KEY')
-)
+# Configuration OpenAI (initialisé à la demande)
+client = None
 
 # Configuration Cloudinary
 cloudinary.config(
@@ -64,9 +62,16 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
 def analyze_image_with_openai(image_file):
     """Analyse l'image avec OpenAI pour déterminer le meilleur cadrage"""
     try:
+        # Initialiser OpenAI seulement si nécessaire
+        global client
+        if client is None:
+            api_key = os.environ.get('OPENAI_API_KEY')
+            if not api_key:
+                return 'center'
+            client = OpenAI(api_key=api_key)
+        
         # Convertir l'image en base64
         image = Image.open(image_file)
-        # Redimensionner pour l'analyse (plus rapide)
         image.thumbnail((512, 512))
         buffer = io.BytesIO()
         image.save(buffer, format='JPEG')
@@ -95,7 +100,6 @@ def analyze_image_with_openai(image_file):
         )
         
         gravity = response.choices[0].message.content.strip().lower()
-        # Valider la réponse
         valid_positions = ['center', 'top', 'bottom', 'left', 'right']
         return gravity if gravity in valid_positions else 'center'
         
