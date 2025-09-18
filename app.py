@@ -60,18 +60,19 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
         return None
 
 def analyze_image_with_openai(image_file):
-    """Analyse l'image avec OpenAI pour déterminer le meilleur cadrage"""
+    """Analyse l'image avec OpenAI pour déterminer les meilleures dimensions"""
     try:
         # Initialiser OpenAI seulement si nécessaire
         global client
         if client is None:
             api_key = os.environ.get('OPENAI_API_KEY')
             if not api_key:
-                return 'center'
+                return {'width': 1200, 'height': 900, 'gravity': 'center'}
             client = OpenAI(api_key=api_key)
         
         # Convertir l'image en base64
         image = Image.open(image_file)
+        original_width, original_height = image.size
         image.thumbnail((512, 512))
         buffer = io.BytesIO()
         image.save(buffer, format='JPEG')
@@ -85,7 +86,7 @@ def analyze_image_with_openai(image_file):
                     "content": [
                         {
                             "type": "text",
-                            "text": "Analyse cette image et détermine le meilleur cadrage pour un portfolio photographique. Réponds uniquement par un mot: 'center', 'top', 'bottom', 'left', ou 'right' selon où se trouve l'élément principal."
+                            "text": f"Analyse cette image (dimensions originales: {original_width}x{original_height}). Détermine les meilleures dimensions pour un portfolio photographique et le cadrage optimal. Réponds au format JSON: {{\"width\": nombre, \"height\": nombre, \"gravity\": \"center/top/bottom/left/right\"}}. Choisis des dimensions qui préservent le ratio et mettent en valeur le sujet principal."
                         },
                         {
                             "type": "image_url",
@@ -96,24 +97,41 @@ def analyze_image_with_openai(image_file):
                     ]
                 }
             ],
-            max_tokens=10
+            max_tokens=50
         )
         
-        gravity = response.choices[0].message.content.strip().lower()
+        result = response.choices[0].message.content.strip()
+        # Parser la réponse JSON
+        import json
+        ai_result = json.loads(result)
+        
+        # Valider et ajuster les dimensions
+        width = max(400, min(2000, ai_result.get('width', 1200)))
+        height = max(300, min(1500, ai_result.get('height', 900)))
+        gravity = ai_result.get('gravity', 'center')
+        
         valid_positions = ['center', 'top', 'bottom', 'left', 'right']
-        return gravity if gravity in valid_positions else 'center'
+        if gravity not in valid_positions:
+            gravity = 'center'
+            
+        return {'width': width, 'height': height, 'gravity': gravity}
         
     except Exception as e:
         print(f"Erreur analyse OpenAI: {e}")
-        return 'center'
+        return {'width': 1200, 'height': 900, 'gravity': 'center'}
 
-def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, target_height=900):
-    """Upload avec analyse IA OpenAI pour optimisation automatique"""
+def upload_with_ai_optimization(file, folder="prima_photo", default_width=1200, default_height=900):
+    """Upload avec redimensionnement automatique IA"""
     try:
-        # Analyser l'image avec OpenAI
-        file.seek(0)  # Reset file pointer
-        ai_gravity = analyze_image_with_openai(file)
-        file.seek(0)  # Reset again for upload
+        # Analyser l'image avec OpenAI pour déterminer les meilleures dimensions
+        file.seek(0)
+        ai_analysis = analyze_image_with_openai(file)
+        file.seek(0)
+        
+        # Utiliser les dimensions déterminées par l'IA
+        optimal_width = ai_analysis['width']
+        optimal_height = ai_analysis['height']
+        ai_gravity = ai_analysis['gravity']
         
         # Mapping pour Cloudinary
         gravity_map = {
@@ -126,25 +144,27 @@ def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, t
         
         cloudinary_gravity = gravity_map.get(ai_gravity, 'center')
         
+        print(f"IA recommande: {optimal_width}x{optimal_height}, cadrage: {ai_gravity}")
+        
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
             transformation=[
-                {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': cloudinary_gravity},
+                {'width': optimal_width, 'height': optimal_height, 'crop': 'fill', 'gravity': cloudinary_gravity},
                 {'quality': 'auto', 'fetch_format': 'auto'}
             ]
         )
         return result['secure_url']
         
     except Exception as e:
-        print(f"Erreur upload avec IA OpenAI: {e}")
-        # Fallback sans IA
+        print(f"Erreur upload avec IA: {e}")
+        # Fallback avec dimensions par défaut
         try:
             result = cloudinary.uploader.upload(
                 file,
                 folder=folder,
                 transformation=[
-                    {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': 'center'},
+                    {'width': default_width, 'height': default_height, 'crop': 'fill', 'gravity': 'center'},
                     {'quality': 'auto', 'fetch_format': 'auto'}
                 ]
             )
