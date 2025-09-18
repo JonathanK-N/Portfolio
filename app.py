@@ -125,55 +125,34 @@ def analyze_image_with_openai(image_file):
         return {'width': 1200, 'height': 900, 'gravity': 'center'}
 
 def upload_with_ai_optimization(file, folder="prima_photo", default_width=1200, default_height=900):
-    """Upload avec redimensionnement automatique IA"""
+    """Upload sans redimensionnement forcé - image entière préservée"""
     try:
-        # Analyser l'image avec OpenAI pour déterminer les meilleures dimensions
-        file.seek(0)
-        ai_analysis = analyze_image_with_openai(file)
-        file.seek(0)
-        
-        # Utiliser les dimensions déterminées par l'IA
-        optimal_width = ai_analysis['width']
-        optimal_height = ai_analysis['height']
-        ai_gravity = ai_analysis['gravity']
-        
-        # Mapping pour Cloudinary
-        gravity_map = {
-            'center': 'center',
-            'top': 'north',
-            'bottom': 'south',
-            'left': 'west',
-            'right': 'east'
-        }
-        
-        cloudinary_gravity = gravity_map.get(ai_gravity, 'center')
-        
-        print(f"=== ANALYSE IA ===")
-        print(f"Dimensions originales de l'image détectées")
-        print(f"IA recommande: {optimal_width}x{optimal_height}")
-        print(f"Cadrage optimal: {ai_gravity}")
-        print(f"Cloudinary gravity: {cloudinary_gravity}")
-        print(f"=================")
+        print(f"=== UPLOAD OPTIMISÉ ===")
+        print(f"Upload de l'image en taille originale")
+        print(f"Préservation des proportions")
+        print(f"========================")
         
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
             transformation=[
-                {'width': optimal_width, 'height': optimal_height, 'crop': 'fill', 'gravity': cloudinary_gravity},
-                {'quality': 'auto', 'fetch_format': 'auto'}
+                # Optimisation sans redimensionnement forcé
+                {'quality': 'auto:best', 'fetch_format': 'auto'},
+                # Limite de taille maximale pour performance
+                {'if': 'w_gt_2000', 'width': 2000, 'crop': 'scale'},
+                {'if': 'h_gt_1500', 'height': 1500, 'crop': 'scale'}
             ]
         )
         return result['secure_url']
         
     except Exception as e:
-        print(f"Erreur upload avec IA: {e}")
-        # Fallback avec dimensions par défaut
+        print(f"Erreur upload optimisé: {e}")
+        # Fallback simple
         try:
             result = cloudinary.uploader.upload(
                 file,
                 folder=folder,
                 transformation=[
-                    {'width': default_width, 'height': default_height, 'crop': 'fill', 'gravity': 'center'},
                     {'quality': 'auto', 'fetch_format': 'auto'}
                 ]
             )
