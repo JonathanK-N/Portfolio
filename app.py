@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 import os
 import json
+import base64
 from werkzeug.utils import secure_filename
 import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
+from openai import OpenAI
+from PIL import Image
+import io
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'prima_photo_secret_key_change_in_production')
@@ -17,6 +21,11 @@ app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024  # 30MB max
 # Configuration admin
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'prima2024')
+
+# Configuration OpenAI
+client = OpenAI(
+    api_key=os.environ.get('OPENAI_API_KEY')
+)
 
 # Configuration Cloudinary
 cloudinary.config(
@@ -52,29 +61,80 @@ def upload_to_cloudinary(file, folder="prima_photo", crop_position="center"):
         print(f"Erreur upload Cloudinary: {e}")
         return None
 
-def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, target_height=900):
-    """Upload avec IA Cloudinary pour optimisation automatique"""
+def analyze_image_with_openai(image_file):
+    """Analyse l'image avec OpenAI pour déterminer le meilleur cadrage"""
     try:
+        # Convertir l'image en base64
+        image = Image.open(image_file)
+        # Redimensionner pour l'analyse (plus rapide)
+        image.thumbnail((512, 512))
+        buffer = io.BytesIO()
+        image.save(buffer, format='JPEG')
+        image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        response = client.chat.completions.create(
+            model="gpt-4-vision-preview",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Analyse cette image et détermine le meilleur cadrage pour un portfolio photographique. Réponds uniquement par un mot: 'center', 'top', 'bottom', 'left', ou 'right' selon où se trouve l'élément principal."
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=10
+        )
+        
+        gravity = response.choices[0].message.content.strip().lower()
+        # Valider la réponse
+        valid_positions = ['center', 'top', 'bottom', 'left', 'right']
+        return gravity if gravity in valid_positions else 'center'
+        
+    except Exception as e:
+        print(f"Erreur analyse OpenAI: {e}")
+        return 'center'
+
+def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, target_height=900):
+    """Upload avec analyse IA OpenAI pour optimisation automatique"""
+    try:
+        # Analyser l'image avec OpenAI
+        file.seek(0)  # Reset file pointer
+        ai_gravity = analyze_image_with_openai(file)
+        file.seek(0)  # Reset again for upload
+        
+        # Mapping pour Cloudinary
+        gravity_map = {
+            'center': 'center',
+            'top': 'north',
+            'bottom': 'south',
+            'left': 'west',
+            'right': 'east'
+        }
+        
+        cloudinary_gravity = gravity_map.get(ai_gravity, 'center')
+        
         result = cloudinary.uploader.upload(
             file,
             folder=folder,
             transformation=[
-                # IA pour détection automatique du sujet principal
-                {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': 'auto'},
-                # Optimisation automatique de la qualité et du format
-                {'quality': 'auto:best', 'fetch_format': 'auto'},
-                # Amélioration automatique de l'image
-                {'effect': 'auto_contrast'},
-                {'effect': 'auto_color'}
-            ],
-            # Activer l'analyse IA
-            detection='adv_face',
-            auto_tagging=0.7
+                {'width': target_width, 'height': target_height, 'crop': 'fill', 'gravity': cloudinary_gravity},
+                {'quality': 'auto', 'fetch_format': 'auto'}
+            ]
         )
         return result['secure_url']
+        
     except Exception as e:
-        print(f"Erreur upload Cloudinary avec IA: {e}")
-        # Fallback sans IA si erreur
+        print(f"Erreur upload avec IA OpenAI: {e}")
+        # Fallback sans IA
         try:
             result = cloudinary.uploader.upload(
                 file,
@@ -86,7 +146,7 @@ def upload_with_ai_optimization(file, folder="prima_photo", target_width=1200, t
             )
             return result['secure_url']
         except Exception as e2:
-            print(f"Erreur upload Cloudinary fallback: {e2}")
+            print(f"Erreur upload fallback: {e2}")
             return None
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
