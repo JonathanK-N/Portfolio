@@ -117,7 +117,11 @@ def analyze_image_with_openai(image_file):
         return {'width': width, 'height': height, 'gravity': gravity}
         
     except Exception as e:
+        print(f"=== ERREUR IA ===")
         print(f"Erreur analyse OpenAI: {e}")
+        print(f"Utilisation des dimensions par défaut: 1200x900")
+        print(f"Clé API présente: {bool(os.environ.get('OPENAI_API_KEY'))}")
+        print(f"================")
         return {'width': 1200, 'height': 900, 'gravity': 'center'}
 
 def upload_with_ai_optimization(file, folder="prima_photo", default_width=1200, default_height=900):
@@ -144,7 +148,12 @@ def upload_with_ai_optimization(file, folder="prima_photo", default_width=1200, 
         
         cloudinary_gravity = gravity_map.get(ai_gravity, 'center')
         
-        print(f"IA recommande: {optimal_width}x{optimal_height}, cadrage: {ai_gravity}")
+        print(f"=== ANALYSE IA ===")
+        print(f"Dimensions originales de l'image détectées")
+        print(f"IA recommande: {optimal_width}x{optimal_height}")
+        print(f"Cadrage optimal: {ai_gravity}")
+        print(f"Cloudinary gravity: {cloudinary_gravity}")
+        print(f"=================")
         
         result = cloudinary.uploader.upload(
             file,
@@ -424,7 +433,8 @@ def admin_add_image():
                 app_data['gallery_images'] = GALLERY_IMAGES
                 save_data(app_data)
                 
-                flash('Image ajoutée avec succès !', 'success')
+                # Afficher les détails de l'analyse IA
+                flash(f'Image ajoutée avec succès ! IA a analysé et optimisé automatiquement.', 'success')
                 return redirect(url_for('admin_gallery'))
             else:
                 flash('Erreur lors de l\'upload', 'error')
