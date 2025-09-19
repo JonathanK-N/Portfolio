@@ -47,7 +47,7 @@
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Cliquez pour sélectionner plusieurs images</p>
                                 <small>Maintenez Ctrl/Cmd pour sélectionner plusieurs fichiers</small>
-                                <small>Formats acceptés: JPG, PNG, GIF (max 30MB par fichier)</small>
+                                <small>Formats acceptés: JPG, PNG, GIF (max 10MB par fichier)</small>
                             </div>
                         </div>
                     </div>
@@ -56,8 +56,8 @@
                         <i class="fas fa-info-circle" style="color: #856404;"></i>
                         <strong>Upload multiple</strong>
                         <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #856404;">
-                            Vous pouvez sélectionner jusqu'à {{ 15 - album.photos|length }} photos supplémentaires pour cet album.
-                            Les titres seront générés automatiquement à partir des noms de fichiers.
+                            Vous pouvez sélectionner jusqu'à {{ 15 - album.photos|length }} photos supplémentaires (max 10MB chacune).
+                            Pour de gros fichiers, uploadez par petits groupes de 3-5 photos.
                         </p>
                     </div>
 

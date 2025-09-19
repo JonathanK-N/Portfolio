@@ -27,10 +27,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     filesList.appendChild(fileItem);
                 }
                 
-                // Afficher le nombre total
+                // Calculer la taille totale
+                let totalSize = 0;
+                for (let i = 0; i < files.length; i++) {
+                    totalSize += files[i].size;
+                }
+                
+                // Afficher le nombre total et la taille
                 const totalInfo = document.createElement('div');
                 totalInfo.style.cssText = 'margin-top: 0.5rem; font-weight: bold; color: #495057;';
-                totalInfo.textContent = `Total: ${files.length} fichier(s) sélectionné(s)`;
+                const totalSizeMB = (totalSize / 1024 / 1024).toFixed(1);
+                totalInfo.innerHTML = `Total: ${files.length} fichier(s) - ${totalSizeMB} MB`;
+                
+                // Avertissement si trop gros
+                if (totalSize > 100 * 1024 * 1024) { // 100MB
+                    totalInfo.style.color = '#dc3545';
+                    totalInfo.innerHTML += '<br><small>⚠️ Taille importante - Considérez uploader par petits groupes</small>';
+                }
+                
                 filesList.appendChild(totalInfo);
             } else {
                 selectedFiles.style.display = 'none';

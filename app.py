@@ -16,7 +16,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'prima_photo_secret_key_change_in_
 # Configuration pour les images
 UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024  # 30MB max
+app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max pour upload multiple
 
 # Configuration admin
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
