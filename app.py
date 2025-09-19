@@ -264,7 +264,8 @@ DEFAULT_DATA = {
             'includes': ['Séance photo', '15 photos retouchées', 'Impression offerte'],
             'image': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop'
         }
-    }
+    },
+    'categories': ['portrait', 'mariage', 'anniversaire']
 }
 
 def load_data():
@@ -285,6 +286,7 @@ app_data = load_data()
 PAGE_CONTENT = app_data['page_content']
 GALLERY_IMAGES = app_data['gallery_images']
 SERVICES = app_data['services']
+CATEGORIES = app_data.get('categories', ['portrait', 'mariage', 'anniversaire'])
 
 
 
@@ -420,7 +422,33 @@ def admin_add_image():
         else:
             flash('Fichier invalide', 'error')
     
-    return render_template('admin/add_image.html')
+    return render_template('admin/add_image.html', categories=CATEGORIES)
+
+@app.route('/admin/categories', methods=['GET', 'POST'])
+def admin_categories():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'add':
+            new_category = request.form.get('category_name')
+            if new_category and new_category not in CATEGORIES:
+                CATEGORIES.append(new_category)
+                app_data['categories'] = CATEGORIES
+                save_data(app_data)
+                flash(f'Catégorie "{new_category}" ajoutée !', 'success')
+        
+        elif action == 'delete':
+            category_to_delete = request.form.get('category_name')
+            if category_to_delete in CATEGORIES:
+                CATEGORIES.remove(category_to_delete)
+                app_data['categories'] = CATEGORIES
+                save_data(app_data)
+                flash(f'Catégorie "{category_to_delete}" supprimée !', 'success')
+    
+    return render_template('admin/categories.html', categories=CATEGORIES)
 
 @app.route('/admin/gallery/delete/<int:image_id>')
 def admin_delete_image(image_id):
@@ -443,6 +471,70 @@ def admin_services():
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin_login'))
     return render_template('admin/services.html', services=SERVICES)
+
+@app.route('/admin/services/add', methods=['GET', 'POST'])
+def admin_add_service():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        service_key = request.form.get('service_key')
+        name = request.form.get('name')
+        price = request.form.get('price')
+        duration = request.form.get('duration')
+        description = request.form.get('description')
+        
+        if service_key and service_key not in SERVICES:
+            # Gestion de l'image
+            file = request.files.get('service_image')
+            image_url = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop'
+            if file and allowed_file(file.filename):
+                cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/services/{service_key}", 400, 300)
+                if cloudinary_url:
+                    image_url = cloudinary_url
+            
+            # Gestion des inclusions
+            includes = []
+            for i in range(10):
+                include = request.form.get(f'include_{i}')
+                if include and include.strip():
+                    includes.append(include.strip())
+            
+            SERVICES[service_key] = {
+                'name': name,
+                'price': price,
+                'duration': duration,
+                'description': description,
+                'includes': includes,
+                'image': image_url
+            }
+            
+            # Sauvegarder
+            app_data['services'] = SERVICES
+            save_data(app_data)
+            
+            flash('Service ajouté avec succès !', 'success')
+            return redirect(url_for('admin_services'))
+        else:
+            flash('Clé de service invalide ou déjà existante', 'error')
+    
+    return render_template('admin/add_service.html')
+
+@app.route('/admin/services/delete/<service_key>')
+def admin_delete_service(service_key):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if service_key in SERVICES:
+        del SERVICES[service_key]
+        
+        # Sauvegarder
+        app_data['services'] = SERVICES
+        save_data(app_data)
+        
+        flash('Service supprimé !', 'success')
+    
+    return redirect(url_for('admin_services'))
 
 @app.route('/admin/services/edit/<service_key>', methods=['GET', 'POST'])
 def admin_edit_service(service_key):

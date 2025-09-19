@@ -52,11 +52,13 @@
                         <label for="category">Catégorie *</label>
                         <select id="category" name="category" required>
                             <option value="">Sélectionnez une catégorie</option>
-                            <option value="portrait">Portrait</option>
-                            <option value="mariage">Mariage</option>
-                            <option value="anniversaire">Anniversaire</option>
-                            <option value="evenement">Événement</option>
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category.title() }}</option>
+                            {% endfor %}
                         </select>
+                        <a href="{{ url_for('admin_categories') }}" class="btn-link" style="margin-top: 0.5rem; display: inline-block;">
+                            <i class="fas fa-cog"></i> Gérer les catégories
+                        </a>
                     </div>
 
                     <div class="form-group">

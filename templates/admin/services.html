@@ -26,7 +26,9 @@
         <main class="admin-content">
             <header class="admin-header">
                 <h1>Gestion des services</h1>
-                <p>Modifiez vos prestations et tarifs</p>
+                <a href="{{ url_for('admin_add_service') }}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Ajouter un service
+                </a>
             </header>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -64,6 +66,9 @@
                     <div class="service-actions">
                         <a href="{{ url_for('admin_edit_service', service_key=service_key) }}" class="btn-primary">
                             <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{{ url_for('admin_delete_service', service_key=service_key) }}" class="btn-danger" onclick="return confirm('Supprimer ce service ?')">
+                            <i class="fas fa-trash"></i> Supprimer
                         </a>
                     </div>
                 </div>
