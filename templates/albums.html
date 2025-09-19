@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Albums Photo - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6rem 0 4rem;">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">Albums Photo</h1>
+            <p class="hero-subtitle">Découvrez mes collections photographiques</p>
+        </div>
+    </div>
+</section>
+
+<section class="albums-section" style="padding: 4rem 0;">
+    <div class="container">
+        {% if albums %}
+        <div class="albums-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+            {% for album in albums %}
+            <div class="album-card" style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                <div class="album-cover" style="height: 250px; overflow: hidden; position: relative;">
+                    {% if album.photos %}
+                        <img src="{{ album.photos[0].url }}" alt="{{ album.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            <i class="fas fa-images" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="album-count" style="position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
+                        {{ album.photos|length }} photos
+                    </div>
+                </div>
+                
+                <div class="album-info" style="padding: 1.5rem;">
+                    <h3 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ album.name }}</h3>
+                    {% if album.description %}
+                    <p style="color: #6c757d; margin: 0 0 1rem 0;">{{ album.description }}</p>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('view_album', album_id=album.id) }}" class="btn-primary" style="display: inline-block; background: #e74c3c; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 25px; transition: all 0.3s ease;">
+                        <i class="fas fa-eye"></i> Voir l'album
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state text-center" style="padding: 4rem 0;">
+            <i class="fas fa-images" style="font-size: 4rem; color: #bdc3c7; margin-bottom: 1rem;"></i>
+            <h3 style="color: #7f8c8d;">Aucun album disponible</h3>
+            <p style="color: #95a5a6;">Les albums seront bientôt disponibles.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.album-card:hover {
+    transform: translateY(-5px);
+}
+
+.album-card:hover .btn-primary {
+    background: #c0392b;
+}
+</style>
+{% endblock %}

@@ -339,6 +339,18 @@ def book_service(service_type):
     
     return render_template('book_service.html', service=service, service_type=service_type)
 
+@app.route('/albums')
+def albums():
+    return render_template('albums.html', albums=ALBUMS)
+
+@app.route('/albums/<int:album_id>')
+def view_album(album_id):
+    album = next((a for a in ALBUMS if a['id'] == album_id), None)
+    if not album:
+        flash('Album non trouvé', 'error')
+        return redirect(url_for('albums'))
+    return render_template('view_album.html', album=album)
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':

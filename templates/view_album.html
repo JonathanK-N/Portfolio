@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ album.name }} - PRiMA PHOTO{% endblock %}
+
+{% block content %}
+<section class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 6rem 0 4rem;">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">{{ album.name }}</h1>
+            {% if album.description %}
+            <p class="hero-subtitle">{{ album.description }}</p>
+            {% endif %}
+            <div class="album-meta" style="margin-top: 1rem;">
+                <span style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; color: white;">
+                    <i class="fas fa-images"></i> {{ album.photos|length }} photos
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="album-photos" style="padding: 4rem 0;">
+    <div class="container">
+        <div class="photos-actions text-center" style="margin-bottom: 2rem;">
+            <a href="{{ url_for('albums') }}" class="btn-secondary" style="background: #95a5a6; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 25px; margin-right: 1rem;">
+                <i class="fas fa-arrow-left"></i> Retour aux albums
+            </a>
+        </div>
+
+        {% if album.photos %}
+        <div class="photos-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            {% for photo in album.photos %}
+            <div class="photo-item" style="position: relative; overflow: hidden; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; background: #f8f9fa; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                <img src="{{ photo.url }}" alt="{{ photo.title }}" style="max-width: 100%; max-height: 350px; width: auto; height: auto; object-fit: contain; transition: transform 0.3s ease;" onclick="openLightbox('{{ photo.url }}', '{{ photo.title }}')">
+                <div class="photo-title" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: white; padding: 1rem; opacity: 0; transition: opacity 0.3s ease;">
+                    <h4 style="margin: 0; font-size: 1rem;">{{ photo.title }}</h4>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-album text-center" style="padding: 4rem 0;">
+            <i class="fas fa-images" style="font-size: 4rem; color: #bdc3c7; margin-bottom: 1rem;"></i>
+            <h3 style="color: #7f8c8d;">Album vide</h3>
+            <p style="color: #95a5a6;">Cet album ne contient pas encore de photos.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; cursor: pointer;">
+    <div class="lightbox-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90%; max-height: 90%;">
+        <img id="lightbox-img" src="" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        <div class="lightbox-title" style="text-align: center; color: white; margin-top: 1rem;">
+            <h3 id="lightbox-title"></h3>
+        </div>
+    </div>
+    <button class="lightbox-close" style="position: absolute; top: 2rem; right: 2rem; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;" onclick="closeLightbox()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<style>
+.photo-item:hover {
+    transform: translateY(-5px);
+}
+
+.photo-item:hover .photo-title {
+    opacity: 1;
+}
+
+.photo-item img {
+    cursor: pointer;
+}
+
+.photo-item img:hover {
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+function openLightbox(src, title) {
+    document.getElementById('lightbox').style.display = 'block';
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox-title').textContent = title;
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Fermer avec Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
+
+// Fermer en cliquant sur le fond
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeLightbox();
+    }
+});
+</script>
+{% endblock %}
