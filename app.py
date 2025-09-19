@@ -311,7 +311,6 @@ def book_service(service_type):
         phone = request.form.get('phone')
         date = request.form.get('date')
         message = request.form.get('message')
-        budget = request.form.get('budget', '')
         service_name = service['name']
         
         # Créer le message WhatsApp
@@ -320,8 +319,6 @@ def book_service(service_type):
         whatsapp_message += f"📧 Email: {email}\n"
         whatsapp_message += f"📱 Téléphone: {phone}\n"
         whatsapp_message += f"📅 Date souhaitée: {date}\n"
-        if budget:
-            whatsapp_message += f"💰 Budget: {budget}\n"
         whatsapp_message += f"\n💬 Message:\n{message}\n\n"
         whatsapp_message += f"Service: {service_name} ({service.get('price', 'Prix sur demande')})"
         
