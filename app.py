@@ -265,7 +265,8 @@ DEFAULT_DATA = {
             'image': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop'
         }
     },
-    'categories': ['portrait', 'mariage', 'anniversaire']
+    'categories': ['portrait', 'mariage', 'anniversaire'],
+    'albums': []
 }
 
 def load_data():
@@ -287,6 +288,7 @@ PAGE_CONTENT = app_data['page_content']
 GALLERY_IMAGES = app_data['gallery_images']
 SERVICES = app_data['services']
 CATEGORIES = app_data.get('categories', ['portrait', 'mariage', 'anniversaire'])
+ALBUMS = app_data.get('albums', [])
 
 
 
@@ -449,6 +451,114 @@ def admin_categories():
                 flash(f'Catégorie "{category_to_delete}" supprimée !', 'success')
     
     return render_template('admin/categories.html', categories=CATEGORIES)
+
+@app.route('/admin/albums')
+def admin_albums():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/albums.html', albums=ALBUMS)
+
+@app.route('/admin/albums/add', methods=['GET', 'POST'])
+def admin_add_album():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    if request.method == 'POST':
+        album_name = request.form.get('album_name')
+        album_description = request.form.get('album_description')
+        
+        if album_name:
+            new_album = {
+                'id': len(ALBUMS) + 1,
+                'name': album_name,
+                'description': album_description or '',
+                'photos': [],
+                'created_at': '2024-01-01'  # Vous pouvez utiliser datetime si nécessaire
+            }
+            
+            ALBUMS.append(new_album)
+            app_data['albums'] = ALBUMS
+            save_data(app_data)
+            
+            flash(f'Album "{album_name}" créé avec succès !', 'success')
+            return redirect(url_for('admin_albums'))
+    
+    return render_template('admin/add_album.html')
+
+@app.route('/admin/albums/<int:album_id>')
+def admin_view_album(album_id):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    album = next((a for a in ALBUMS if a['id'] == album_id), None)
+    if not album:
+        flash('Album non trouvé', 'error')
+        return redirect(url_for('admin_albums'))
+    
+    return render_template('admin/view_album.html', album=album)
+
+@app.route('/admin/albums/<int:album_id>/add-photo', methods=['GET', 'POST'])
+def admin_add_photo_to_album(album_id):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    album = next((a for a in ALBUMS if a['id'] == album_id), None)
+    if not album:
+        flash('Album non trouvé', 'error')
+        return redirect(url_for('admin_albums'))
+    
+    if len(album['photos']) >= 15:
+        flash('Limite de 15 photos par album atteinte !', 'error')
+        return redirect(url_for('admin_view_album', album_id=album_id))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        file = request.files.get('file')
+        
+        if file and allowed_file(file.filename):
+            cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/albums/{album_id}")
+            
+            if cloudinary_url:
+                new_photo = {
+                    'url': cloudinary_url,
+                    'title': title
+                }
+                album['photos'].append(new_photo)
+                
+                app_data['albums'] = ALBUMS
+                save_data(app_data)
+                
+                flash('Photo ajoutée à l\'album !', 'success')
+                return redirect(url_for('admin_view_album', album_id=album_id))
+    
+    return render_template('admin/add_photo_album.html', album=album)
+
+@app.route('/admin/albums/<int:album_id>/delete-photo/<int:photo_index>')
+def admin_delete_photo_from_album(album_id, photo_index):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    album = next((a for a in ALBUMS if a['id'] == album_id), None)
+    if album and 0 <= photo_index < len(album['photos']):
+        album['photos'].pop(photo_index)
+        app_data['albums'] = ALBUMS
+        save_data(app_data)
+        flash('Photo supprimée de l\'album !', 'success')
+    
+    return redirect(url_for('admin_view_album', album_id=album_id))
+
+@app.route('/admin/albums/<int:album_id>/delete')
+def admin_delete_album(album_id):
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    
+    global ALBUMS
+    ALBUMS = [a for a in ALBUMS if a['id'] != album_id]
+    app_data['albums'] = ALBUMS
+    save_data(app_data)
+    
+    flash('Album supprimé !', 'success')
+    return redirect(url_for('admin_albums'))
 
 @app.route('/admin/gallery/delete/<int:image_id>')
 def admin_delete_image(image_id):

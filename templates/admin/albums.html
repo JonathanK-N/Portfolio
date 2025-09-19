@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Albums - Administration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-sidebar">
+            <div class="admin-logo">
+                <h2><i class="fas fa-camera"></i> PRiMA ADMIN</h2>
+            </div>
+            <ul class="admin-menu">
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="{{ url_for('admin_gallery') }}" class="active"><i class="fas fa-images"></i> Galerie</a></li>
+                <li><a href="{{ url_for('admin_services') }}"><i class="fas fa-cogs"></i> Services</a></li>
+                <li><a href="{{ url_for('admin_pages') }}"><i class="fas fa-file-alt"></i> Pages</a></li>
+                <li><a href="{{ url_for('home') }}" target="_blank"><i class="fas fa-eye"></i> Voir le site</a></li>
+                <li><a href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Gestion des albums</h1>
+                <a href="{{ url_for('admin_add_album') }}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Créer un album
+                </a>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="albums-grid">
+                {% for album in albums %}
+                <div class="album-card">
+                    <div class="album-preview">
+                        {% if album.photos %}
+                            <img src="{{ album.photos[0].url }}" alt="{{ album.name }}">
+                        {% else %}
+                            <div class="album-placeholder">
+                                <i class="fas fa-images"></i>
+                                <p>Aucune photo</p>
+                            </div>
+                        {% endif %}
+                        <div class="album-count">{{ album.photos|length }}/15</div>
+                    </div>
+                    
+                    <div class="album-info">
+                        <h3>{{ album.name }}</h3>
+                        <p>{{ album.description }}</p>
+                        <div class="album-meta">
+                            <span><i class="fas fa-images"></i> {{ album.photos|length }} photos</span>
+                        </div>
+                    </div>
+                    
+                    <div class="album-actions">
+                        <a href="{{ url_for('admin_view_album', album_id=album.id) }}" class="btn-primary">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <a href="{{ url_for('admin_delete_album', album_id=album.id) }}" class="btn-danger" onclick="return confirm('Supprimer cet album ?')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <h3>Aucun album créé</h3>
+                    <p>Créez votre premier album photo</p>
+                    <a href="{{ url_for('admin_add_album') }}" class="btn-primary">
+                        <i class="fas fa-plus"></i> Créer un album
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
