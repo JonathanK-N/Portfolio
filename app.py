@@ -512,24 +512,34 @@ def admin_add_photo_to_album(album_id):
         return redirect(url_for('admin_view_album', album_id=album_id))
     
     if request.method == 'POST':
-        title = request.form.get('title')
-        file = request.files.get('file')
+        files = request.files.getlist('files')
+        uploaded_count = 0
         
-        if file and allowed_file(file.filename):
-            cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/albums/{album_id}")
+        for file in files:
+            if len(album['photos']) >= 15:
+                break
+                
+            if file and allowed_file(file.filename):
+                cloudinary_url = upload_with_ai_optimization(file, f"prima_photo/albums/{album_id}")
+                
+                if cloudinary_url:
+                    # Utiliser le nom du fichier comme titre par défaut
+                    title = file.filename.rsplit('.', 1)[0]
+                    new_photo = {
+                        'url': cloudinary_url,
+                        'title': title
+                    }
+                    album['photos'].append(new_photo)
+                    uploaded_count += 1
+        
+        if uploaded_count > 0:
+            app_data['albums'] = ALBUMS
+            save_data(app_data)
+            flash(f'{uploaded_count} photo(s) ajoutée(s) à l\'album !', 'success')
+        else:
+            flash('Aucune photo valide n\'a été uploadée', 'error')
             
-            if cloudinary_url:
-                new_photo = {
-                    'url': cloudinary_url,
-                    'title': title
-                }
-                album['photos'].append(new_photo)
-                
-                app_data['albums'] = ALBUMS
-                save_data(app_data)
-                
-                flash('Photo ajoutée à l\'album !', 'success')
-                return redirect(url_for('admin_view_album', album_id=album_id))
+        return redirect(url_for('admin_view_album', album_id=album_id))
     
     return render_template('admin/add_photo_album.html', album=album)
 

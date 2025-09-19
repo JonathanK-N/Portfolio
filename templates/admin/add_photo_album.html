@@ -40,36 +40,43 @@
             <div class="form-container">
                 <form method="POST" enctype="multipart/form-data" class="admin-form">
                     <div class="form-group">
-                        <label for="title">Titre de la photo *</label>
-                        <input type="text" id="title" name="title" required placeholder="Ex: Photo de groupe">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="file">Fichier image *</label>
+                        <label for="files">Sélectionner les photos *</label>
                         <div class="file-upload">
-                            <input type="file" id="file" name="file" accept="image/*" required>
+                            <input type="file" id="files" name="files" accept="image/*" multiple required>
                             <div class="file-upload-text">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Cliquez pour sélectionner une image</p>
-                                <small>Formats acceptés: JPG, PNG, GIF (max 30MB)</small>
+                                <p>Cliquez pour sélectionner plusieurs images</p>
+                                <small>Maintenez Ctrl/Cmd pour sélectionner plusieurs fichiers</small>
+                                <small>Formats acceptés: JPG, PNG, GIF (max 30MB par fichier)</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="image-preview" id="imagePreview" style="display: none;">
-                        <img id="previewImg" src="" alt="Aperçu">
-                        <div class="ai-info" style="margin-top: 1rem; padding: 1rem; background: #e8f4fd; border-radius: 8px;">
-                            <i class="fas fa-check-circle" style="color: #27ae60;"></i>
-                            <strong>Affichage optimal garanti</strong>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #666;">
-                                Votre image sera uploadée en taille originale et s'affichera entièrement dans l'album.
-                            </p>
-                        </div>
+                    <div class="upload-info" style="padding: 1rem; background: #fff3cd; border-radius: 8px; margin: 1rem 0;">
+                        <i class="fas fa-info-circle" style="color: #856404;"></i>
+                        <strong>Upload multiple</strong>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #856404;">
+                            Vous pouvez sélectionner jusqu'à {{ 15 - album.photos|length }} photos supplémentaires pour cet album.
+                            Les titres seront générés automatiquement à partir des noms de fichiers.
+                        </p>
+                    </div>
+
+                    <div class="selected-files" id="selectedFiles" style="display: none; margin: 1rem 0;">
+                        <h4>Fichiers sélectionnés :</h4>
+                        <div id="filesList"></div>
+                    </div>
+
+                    <div class="ai-info" style="margin-top: 1rem; padding: 1rem; background: #e8f4fd; border-radius: 8px;">
+                        <i class="fas fa-magic" style="color: #e74c3c;"></i>
+                        <strong>Upload multiple optimisé</strong>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #666;">
+                            Toutes vos images seront uploadées en taille originale et optimisées automatiquement pour un affichage parfait dans l'album.
+                        </p>
                     </div>
 
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">
-                            <i class="fas fa-save"></i> Ajouter à l'album
+                            <i class="fas fa-upload"></i> Uploader les photos
                         </button>
                         <a href="{{ url_for('admin_view_album', album_id=album.id) }}" class="btn-cancel">Annuler</a>
                     </div>
@@ -78,6 +85,6 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='js/admin-gallery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin-album.js') }}"></script>
 </body>
 </html>
