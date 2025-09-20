@@ -365,7 +365,7 @@ def contact():
 @app.route('/admin')
 def admin_login():
     if 'admin_logged_in' in session:
-        return render_template('admin/react_dashboard.html')
+        return redirect('/admin/dashboard')
     return render_template('admin/login.html')
 
 @app.route('/admin/login', methods=['POST'])
@@ -376,7 +376,7 @@ def admin_login_post():
     if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
         session['admin_logged_in'] = True
         flash('Connexion réussie !', 'success')
-        return redirect(url_for('admin_dashboard'))
+        return redirect('/admin/dashboard')
     else:
         flash('Identifiants incorrects', 'error')
         return redirect(url_for('admin_login'))
