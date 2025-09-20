@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
 import os
 import json
 import base64
@@ -365,7 +365,7 @@ def contact():
 @app.route('/admin')
 def admin_login():
     if 'admin_logged_in' in session:
-        return redirect(url_for('admin_dashboard'))
+        return render_template('admin/react_dashboard.html')
     return render_template('admin/login.html')
 
 @app.route('/admin/login', methods=['POST'])
@@ -389,6 +389,12 @@ def admin_logout():
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/react_dashboard.html')
+
+@app.route('/admin/classic')
+def admin_classic_dashboard():
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin_login'))
     return render_template('admin/dashboard.html', images=GALLERY_IMAGES, services=SERVICES, content=PAGE_CONTENT)
@@ -583,44 +589,37 @@ def admin_delete_album(album_id):
 @app.route('/api/dashboard/stats')
 def api_dashboard_stats():
     if 'admin_logged_in' not in session:
-        return {'error': 'Unauthorized'}, 401
+        return jsonify({'error': 'Unauthorized'}), 401
     
-    return {
+    return jsonify({
         'images_count': len(GALLERY_IMAGES),
         'services_count': len(SERVICES),
         'albums_count': len(ALBUMS),
         'categories_count': len(CATEGORIES)
-    }
+    })
 
-@app.route('/api/gallery', methods=['GET', 'POST'])
+@app.route('/api/gallery')
 def api_gallery():
     if 'admin_logged_in' not in session:
-        return {'error': 'Unauthorized'}, 401
+        return jsonify({'error': 'Unauthorized'}), 401
     
-    if request.method == 'GET':
-        return {'images': GALLERY_IMAGES, 'categories': CATEGORIES}
-    
-    return {'success': True}
+    return jsonify({'images': GALLERY_IMAGES, 'categories': CATEGORIES})
 
 @app.route('/api/services')
 def api_services():
     if 'admin_logged_in' not in session:
-        return {'error': 'Unauthorized'}, 401
+        return jsonify({'error': 'Unauthorized'}), 401
     
-    return {'services': SERVICES}
+    return jsonify({'services': SERVICES})
 
 @app.route('/api/albums')
 def api_albums():
     if 'admin_logged_in' not in session:
-        return {'error': 'Unauthorized'}, 401
+        return jsonify({'error': 'Unauthorized'}), 401
     
-    return {'albums': ALBUMS}
+    return jsonify({'albums': ALBUMS})
 
-@app.route('/admin/react')
-def admin_react_dashboard():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin_login'))
-    return render_template('admin/react_dashboard.html')
+
 
 @app.route('/admin/gallery/delete/<int:image_id>')
 def admin_delete_image(image_id):
