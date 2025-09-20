@@ -391,7 +391,7 @@ def admin_logout():
 def admin_dashboard():
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin_login'))
-    return render_template('admin/react_dashboard.html')
+    return render_template('admin/react_basic.html')
 
 @app.route('/admin/classic')
 def admin_classic_dashboard():

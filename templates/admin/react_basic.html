@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard React</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2em; color: #e74c3c; font-weight: bold; }
+        .btn { background: #95a5a6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard React - PRiMA ADMIN</h1>
+            <a href="/admin/classic" class="btn">← Admin Classique</a>
+        </div>
+        
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="images">-</div>
+                <div>Images</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="services">-</div>
+                <div>Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="albums">-</div>
+                <div>Albums</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="categories">-</div>
+                <div>Catégories</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/dashboard/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('images').textContent = data.images_count || 0;
+                document.getElementById('services').textContent = data.services_count || 0;
+                document.getElementById('albums').textContent = data.albums_count || 0;
+                document.getElementById('categories').textContent = data.categories_count || 0;
+            })
+            .catch(error => console.error('Erreur:', error));
+    </script>
+</body>
+</html>
