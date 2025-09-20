@@ -579,6 +579,49 @@ def admin_delete_album(album_id):
     flash('Album supprimé !', 'success')
     return redirect(url_for('admin_albums'))
 
+# API Routes pour React Dashboard
+@app.route('/api/dashboard/stats')
+def api_dashboard_stats():
+    if 'admin_logged_in' not in session:
+        return {'error': 'Unauthorized'}, 401
+    
+    return {
+        'images_count': len(GALLERY_IMAGES),
+        'services_count': len(SERVICES),
+        'albums_count': len(ALBUMS),
+        'categories_count': len(CATEGORIES)
+    }
+
+@app.route('/api/gallery', methods=['GET', 'POST'])
+def api_gallery():
+    if 'admin_logged_in' not in session:
+        return {'error': 'Unauthorized'}, 401
+    
+    if request.method == 'GET':
+        return {'images': GALLERY_IMAGES, 'categories': CATEGORIES}
+    
+    return {'success': True}
+
+@app.route('/api/services')
+def api_services():
+    if 'admin_logged_in' not in session:
+        return {'error': 'Unauthorized'}, 401
+    
+    return {'services': SERVICES}
+
+@app.route('/api/albums')
+def api_albums():
+    if 'admin_logged_in' not in session:
+        return {'error': 'Unauthorized'}, 401
+    
+    return {'albums': ALBUMS}
+
+@app.route('/admin/react')
+def admin_react_dashboard():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template('admin/react_dashboard.html')
+
 @app.route('/admin/gallery/delete/<int:image_id>')
 def admin_delete_image(image_id):
     if 'admin_logged_in' not in session:
